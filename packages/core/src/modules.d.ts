@@ -25,4 +25,6 @@ declare module "virtual:orange/server-bundle" {
       };
     }
   >;
+  export const prerender: string[];
+  export const ssr: true;
 }

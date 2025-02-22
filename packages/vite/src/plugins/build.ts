@@ -1,19 +1,27 @@
 import { assert, unreachable } from "../util.js";
 import type { Context } from "../index.js";
 import type { Manifest, Plugin } from "vite";
+import { releaseAssets } from "../assets.js";
+import { writeFileSync } from "fs";
 
 export function clientBuilder(ctx: Context): Plugin {
   return {
     name: "orange:client-builder",
     enforce: "pre",
-    writeBundle(_, bundle) {
+    writeBundle(options, bundle) {
       const manifestChunk = bundle[".vite/manifest.json"];
       assert("source" in manifestChunk, "missing manifest chunk");
       const clientManifest: Manifest = JSON.parse(
-        (manifestChunk?.source as string) ?? unreachable(),
+        (manifestChunk?.source as string) ?? unreachable()
       );
 
       ctx.clientManifest = clientManifest;
+
+      const manifest = releaseAssets(ctx);
+      writeFileSync(
+        `${options.dir}/assets/manifest-${manifest.version}.js`,
+        `window.__reactRouterManifest=${JSON.stringify(manifest)};`
+      );
     },
     applyToEnvironment(environment) {
       return environment.name === "client";
@@ -38,23 +46,15 @@ export function clientBuilder(ctx: Context): Plugin {
         },
         optimizeDeps: {
           include: [
-            // Pre-bundle React dependencies to avoid React duplicates,
-            // even if React dependencies are not direct dependencies.
-            // https://react.dev/warnings/invalid-hook-call-warning#duplicate-react
             "react",
             "react/jsx-runtime",
             "react/jsx-dev-runtime",
             "react-dom",
             "react-dom/client",
-
-            // Pre-bundle router dependencies to avoid router duplicates.
-            // Mismatching routers cause `Error: You must render this element inside a <Remix> element`.
-            "react-router",
-            "react-router/dom",
           ],
         },
         resolve: {
-          dedupe: ["react", "react-dom", "react-router"],
+          dedupe: ["react", "react-dom", "react-router", "@orange-js/orange"],
         },
       };
     },
@@ -86,19 +86,11 @@ export function serverBuilder(): Plugin {
         },
         optimizeDeps: {
           include: [
-            // Pre-bundle React dependencies to avoid React duplicates,
-            // even if React dependencies are not direct dependencies.
-            // https://react.dev/warnings/invalid-hook-call-warning#duplicate-react
             "react",
             "react/jsx-runtime",
             "react/jsx-dev-runtime",
             "react-dom",
             "react-dom/server.edge",
-
-            // Pre-bundle router dependencies to avoid router duplicates.
-            // Mismatching routers cause `Error: You must render this element inside a <Remix> element`.
-            "react-router",
-            "react-router/dom",
           ],
         },
         resolve: {
@@ -107,6 +99,7 @@ export function serverBuilder(): Plugin {
             "react-dom",
             "react-router",
             "react-dom/server.edge",
+            "@orange-js/orange",
           ],
         },
       };

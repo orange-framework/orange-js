@@ -4,6 +4,7 @@ import type { Context } from "./index.js";
 import type { RouteManifestEntry } from "./routes.js";
 import { mapObject, unreachable } from "./util.js";
 import { virtualInjectHmrRuntime } from "./plugins/hmr.js";
+import { browserManifestVirtualModule } from "./plugins/dev-manifest.js";
 
 export function releaseAssets(ctx: Context) {
   const routes = ctx.componentRoutes ?? unreachable();
@@ -95,7 +96,7 @@ export function devAssets(ctx: Context) {
       runtime: virtualInjectHmrRuntime.url,
     },
     routes: assetRoutes,
-    url: "/assets/manifest.js",
+    url: browserManifestVirtualModule.url,
     version: "dev",
   };
 }

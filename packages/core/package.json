@@ -42,8 +42,7 @@
   },
   "peerDependencies": {
     "react": ">=19",
-    "react-dom": ">=19",
-    "react-router": "^7.1.1"
+    "react-dom": ">=19"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241230.0",
@@ -58,6 +57,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "hono": "^4.6.20"
+    "hono": "^4.6.20",
+    "react-router": "^7.2.0"
   }
 }

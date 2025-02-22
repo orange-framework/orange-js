@@ -12,6 +12,7 @@ import { removeDataStubs } from "./plugins/remove-data-stubs.js";
 import { entrypoints } from "./plugins/entrypoints.js";
 import { internal } from "./plugins/internal.js";
 import { routeReload } from "./plugins/route-reload.js";
+import { devManifestPlugin } from "./plugins/dev-manifest.js";
 
 export type MiddlewareArgs = {
   request: Request;
@@ -77,6 +78,7 @@ export default function ({
     serverBundle(ctx),
     removeDataStubs(ctx),
     routeReload(),
+    devManifestPlugin(ctx),
     ...internal(),
     ...isolation(),
     ...hmr(),

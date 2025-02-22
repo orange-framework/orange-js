@@ -58,11 +58,13 @@ export function serverBundle(ctx: Context): Plugin {
       ${componentRouteImports.join("\n")}
       ${apiRouteImports.join("\n")}
 
+      export const prerender = [];
       export const entry = { module: serverModule };
       export const future = { unstable_optimizeDeps: false };
       export const basename = "/";
       export const publicPath = "/";
       export const isSpaMode = false;
+      export const ssr = true;
       export const assetsBuildDirectory = "dist/client";
       export const assets = ${JSON.stringify(assets, null, 2)};
       export const routes = {${componentRouteLiterals.join(",")}};
