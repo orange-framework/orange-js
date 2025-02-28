@@ -23,6 +23,7 @@ export interface ServerBuild extends RRServerBuild {
 // @ts-ignore
 import { _env } from "./internal.js";
 import { Hono } from "hono";
+import { createMiddleware } from "hono/factory";
 
 function isProbablyHono(obj: object) {
   const honoKeys = [
@@ -40,6 +41,9 @@ function isProbablyHono(obj: object) {
 }
 
 export function app(serverBuild: ServerBuild) {
+  // @ts-ignore
+  const globalMiddleware: Array<(request: Request, env: Env) => Promise<Response | null | undefined>> = globalThis.middlewareStages ?? [];
+
   wrapLoadersAndActions(serverBuild);
   const handler = createRequestHandler(serverBuild);
   const routeObjects: RouteObject[] = Object.values(serverBuild.routes)
@@ -67,6 +71,17 @@ export function app(serverBuild: ServerBuild) {
   };
 
   const app = new Hono();
+
+  for (const middleware of globalMiddleware) {
+    app.use(createMiddleware(async (c, next) => {
+      const response = await middleware(c.req.raw, c.env);
+      if (response !== null && response !== undefined) {
+        return response;
+      }
+
+      return await next();
+    }));
+  }
 
   for (const [path, module] of Object.entries(serverBuild.apiRoutes)) {
     const { default: handler } = module;
