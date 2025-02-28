@@ -1,0 +1,39 @@
+#
+# Creates 0.0.0-$COMMIT versions for every package and publishes them to NPM
+#
+name: Publish preleases to NPM
+on:
+  release:
+    types: [published]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "23.x"
+          registry-url: "https://registry.npmjs.org"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
+
+      - name: Publish core
+        run: pnpm publish
+        working-directory: packages/core
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish vite
+        run: pnpm publish
+        working-directory: packages/vite
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish create-orange
+        run: pnpm publish
+        working-directory: packages/create-orange
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
