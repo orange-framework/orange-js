@@ -24,6 +24,7 @@ export interface ServerBuild extends RRServerBuild {
 import { _env } from "./internal.js";
 import { Hono } from "hono";
 import { CloudflareEnv, Context } from "./index.js";
+import { createMiddleware } from "hono/factory";
 
 function isProbablyHono(obj: object) {
   const honoKeys = [
@@ -50,6 +51,8 @@ export function app(serverBuild: ServerBuild, options?: AppOptions) {
   const contextFn = options?.context ?? ((env) => ({}));
   // @ts-ignore
   globalThis.__orangeContextFn = contextFn;
+  // @ts-ignore
+  const globalMiddleware: Array<(request: Request, env: Env) => Promise<Response | null | undefined>> = globalThis.middlewareStages ?? [];
 
   wrapLoadersAndActions(serverBuild);
   const handler = createRequestHandler(serverBuild);
@@ -83,6 +86,17 @@ export function app(serverBuild: ServerBuild, options?: AppOptions) {
   };
 
   const app = new Hono();
+
+  for (const middleware of globalMiddleware) {
+    app.use(createMiddleware(async (c, next) => {
+      const response = await middleware(c.req.raw, c.env);
+      if (response !== null && response !== undefined) {
+        return response;
+      }
+
+      return await next();
+    }));
+  }
 
   for (const [path, module] of Object.entries(serverBuild.apiRoutes)) {
     const { default: handler } = module;

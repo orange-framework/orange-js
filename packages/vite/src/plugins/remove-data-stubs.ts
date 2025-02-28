@@ -23,6 +23,9 @@ const baseClassesToStrip = [
   "WorkflowEntrypoint",
   "RouteDurableObject",
   "DurableObject",
+  "Agent",
+  "AIChatAgent",
+  "McpAgent"
 ];
 const allNamesToStrip = [...namesToStrip, ...baseClassesToStrip];
 const extensionsToParse = [".js", ".jsx", ".ts", ".tsx"];
