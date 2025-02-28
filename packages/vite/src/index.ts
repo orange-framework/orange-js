@@ -13,6 +13,7 @@ import { entrypoints } from "./plugins/entrypoints.js";
 import { internal } from "./plugins/internal.js";
 import { routeReload } from "./plugins/route-reload.js";
 import { devManifestPlugin } from "./plugins/dev-manifest.js";
+import { agentsMiddlewareInjector } from "./plugins/agents.js";
 
 export type MiddlewareArgs = {
   request: Request;
@@ -99,6 +100,7 @@ export default function ({
     removeDataStubs(ctx),
     routeReload(),
     devManifestPlugin(ctx),
+    agentsMiddlewareInjector(ctx),
     ...internal(),
     ...isolation(),
     ...hmr(),
