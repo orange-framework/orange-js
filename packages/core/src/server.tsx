@@ -82,7 +82,6 @@ export function app(serverBuild: ServerBuild) {
     }
   }
 
-  app.mount("/api", () => new Response("API route not found", { status: 404 }));
   app.mount("/", fetch);
 
   return app;

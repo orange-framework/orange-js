@@ -23,15 +23,16 @@
     "vite": "^6.0.11"
   },
   "dependencies": {
-    "@cloudflare/vite-plugin": "^0.1.5",
     "@babel/generator": "^7.26.5",
     "@babel/parser": "^7.26.7",
     "@babel/traverse": "^7.26.7",
     "@babel/types": "^7.26.7",
+    "@cloudflare/vite-plugin": "^0.1.5",
     "@react-router/dev": "^7.2.0",
     "@react-router/fs-routes": "^7.2.0",
     "dedent": "^1.5.3",
     "es-module-lexer": "^1.6.0",
+    "minimatch": "^10.0.1",
     "react-refresh": "^0.16.0"
   },
   "files": [
