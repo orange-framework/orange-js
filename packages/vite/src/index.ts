@@ -29,9 +29,15 @@ const ctx: Context = { componentRoutes: undefined, apiRoutes: [], clientManifest
 
 export type PluginConfig = {
   cloudflare?: Parameters<typeof cloudflare>[0];
+  /**
+   * Glob patterns for API routes.
+   * @default ["api*.{ts,js}"]
+   */
+  apiRoutePatterns?: string[];
 };
 
 export default function ({
+  apiRoutePatterns = ["api*.{ts,js}"],
   cloudflare: cloudflareCfg,
 }: PluginConfig = {}): Plugin[] {
   return [
@@ -42,7 +48,7 @@ export default function ({
       async config(userConfig, env) {
         globalThis.__reactRouterAppDirectory = "app";
         const routes = await flatRoutes();
-        const { manifest, apiRoutes } = loadRoutes(routes);
+        const { manifest, apiRoutes } = loadRoutes(routes, apiRoutePatterns);
         ctx.componentRoutes = manifest;
         ctx.apiRoutes = apiRoutes;
 

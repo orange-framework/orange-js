@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { flatRoutes } from "@react-router/fs-routes";
 import { unreachable } from "./util.js";
+import { minimatch } from "minimatch";
 
 function loadRoute(file: string) {
   const contents = fs.readFileSync(file, "utf-8");
@@ -70,7 +71,10 @@ type LoadedRoutes = {
   apiRoutes: ApiRoute[];
 };
 
-export function loadRoutes(routes: RouteConfigEntry[]): LoadedRoutes {
+export function loadRoutes(
+  routes: RouteConfigEntry[],
+  apiRoutePatterns: string[]
+): LoadedRoutes {
   const root: RouteManifestEntry = {
     id: "root",
     file: "app/root.tsx",
@@ -95,8 +99,10 @@ export function loadRoutes(routes: RouteConfigEntry[]): LoadedRoutes {
     }
   };
 
-  const topLevelApiRoutes = routes.filter(
-    (it) => it.path === "api" || it.path?.startsWith("api/")
+  const topLevelApiRoutes = routes.filter((it) =>
+    apiRoutePatterns.some((pattern) =>
+      minimatch(it.file.replace("routes/", ""), pattern)
+    )
   );
   const apiRoutes = topLevelApiRoutes.flatMap(collectApiRoutes);
 
