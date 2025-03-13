@@ -3,20 +3,33 @@ import { flatRoutes } from "@react-router/fs-routes";
 import { unreachable } from "./util.js";
 import { minimatch } from "minimatch";
 
+// TOOD: use AST for this, this is a hack
 function loadRoute(file: string) {
   const contents = fs.readFileSync(file, "utf-8");
   return {
     hasLoader:
-      contents.includes("export async function loader") ||
-      contents.includes("async loader()") ||
+      contents.includes("async loader(") ||
       contents.includes("async webSocketConnect(") ||
-      contents.includes("export const loader = "),
+      contents.includes("export async function loader") ||
+      contents.includes("export function loader") ||
+      contents.includes("export const loader = ") ||
+      contents.includes("export let loader = "),
     hasAction:
-      contents.includes("export async function action") ||
       contents.includes("async action(") ||
-      contents.includes("export const action = "),
-    hasClientLoader: contents.includes("export async function clientLoader"),
-    hasClientAction: contents.includes("export async function clientAction"),
+      contents.includes("export async function action") ||
+      contents.includes("export function action") ||
+      contents.includes("export const action = ") ||
+      contents.includes("export let action = "),
+    hasClientLoader:
+      contents.includes("export async function clientLoader") ||
+      contents.includes("export function clientLoader") ||
+      contents.includes("export const clientLoader") ||
+      contents.includes("export let clientLoader"),
+    hasClientAction:
+      contents.includes("export async function clientAction") ||
+      contents.includes("export function clientAction") ||
+      contents.includes("export const clientAction") ||
+      contents.includes("export let clientAction"),
     exportedClasses:
       contents
         .match(/export class (\w+)/g)
