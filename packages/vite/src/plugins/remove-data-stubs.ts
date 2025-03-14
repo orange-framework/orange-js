@@ -23,6 +23,8 @@ const baseClassesToStrip = [
   "WorkflowEntrypoint",
   "RouteDurableObject",
   "DurableObject",
+  "Agent",
+  "AIChatAgent"
 ];
 const allNamesToStrip = [...namesToStrip, ...baseClassesToStrip];
 const extensionsToParse = [".js", ".jsx", ".ts", ".tsx"];
