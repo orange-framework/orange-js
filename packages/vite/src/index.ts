@@ -25,7 +25,11 @@ export type Context = {
   clientManifest: Manifest | undefined;
 };
 
-const ctx: Context = { componentRoutes: undefined, apiRoutes: [], clientManifest: undefined };
+const ctx: Context = {
+  componentRoutes: undefined,
+  apiRoutes: [],
+  clientManifest: undefined,
+};
 
 export type PluginConfig = {
   cloudflare?: Parameters<typeof cloudflare>[0];
@@ -41,7 +45,9 @@ export default function ({
   cloudflare: cloudflareCfg,
 }: PluginConfig = {}): Plugin[] {
   return [
-    cloudflare(cloudflareCfg) as unknown as Plugin,
+    cloudflare(
+      cloudflareCfg ?? { viteEnvironment: { name: "ssr" } }
+    ) as unknown as Plugin,
     {
       name: "orange:route-plugin",
       enforce: "pre",
@@ -77,7 +83,7 @@ export default function ({
       },
     },
     clientBuilder(ctx),
-    serverBuilder(),
+    serverBuilder(ctx),
     workerStub(),
     durableObjectRoutes(ctx),
     entrypoints(ctx),
