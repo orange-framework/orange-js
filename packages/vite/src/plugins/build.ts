@@ -45,6 +45,10 @@ export function clientBuilder(ctx: Context): Plugin {
           },
         },
         optimizeDeps: {
+          entries: [
+            "app/entry.client.ts",
+            ...Object.values(routes).map((r) => r.file),
+          ],
           include: [
             "react",
             "react/jsx-runtime",
@@ -61,7 +65,7 @@ export function clientBuilder(ctx: Context): Plugin {
   };
 }
 
-export function serverBuilder(): Plugin {
+export function serverBuilder(ctx: Context): Plugin {
   return {
     name: "orange:server-builder",
     enforce: "pre",
@@ -70,6 +74,8 @@ export function serverBuilder(): Plugin {
     },
     configEnvironment(name, config, env) {
       if (name === "client") return config;
+
+      const routes = ctx.componentRoutes ?? unreachable();
 
       return {
         ...config,
@@ -85,6 +91,10 @@ export function serverBuilder(): Plugin {
           },
         },
         optimizeDeps: {
+          entries: [
+            "app/entry.server.ts",
+            ...Object.values(routes).map((r) => r.file),
+          ],
           include: [
             "react",
             "react/jsx-runtime",
