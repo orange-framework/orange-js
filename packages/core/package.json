@@ -39,6 +39,10 @@
     "./route-module": {
       "import": "./dist/route-module.js",
       "types": "./dist/route-module.d.ts"
+    },
+    "./hono": {
+      "import": "./dist/hono.js",
+      "types": "./dist/hono.d.ts"
     }
   },
   "peerDependencies": {
