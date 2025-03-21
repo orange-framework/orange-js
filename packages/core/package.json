@@ -38,6 +38,10 @@
     "./workflows": {
       "import": "./dist/workflows.js",
       "types": "./dist/workflows.d.ts"
+    },
+    "./hono": {
+      "import": "./dist/hono.js",
+      "types": "./dist/hono.d.ts"
     }
   },
   "peerDependencies": {
