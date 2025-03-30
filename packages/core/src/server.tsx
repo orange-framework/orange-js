@@ -23,6 +23,7 @@ export interface ServerBuild extends RRServerBuild {
 // @ts-ignore
 import { _env } from "./internal.js";
 import { Hono } from "hono";
+import { CloudflareEnv, Context } from "./index.js";
 
 function isProbablyHono(obj: object) {
   const honoKeys = [
@@ -39,7 +40,20 @@ function isProbablyHono(obj: object) {
   return honoKeys.every((key) => key in obj);
 }
 
-export function app(serverBuild: ServerBuild) {
+export type AppOptions = {
+  context?: (
+    env: CloudflareEnv,
+  ) => Omit<Context, "cloudflare"> | Promise<Omit<Context, "cloudflare">>;
+};
+
+export function app(
+  serverBuild: ServerBuild,
+  options?: AppOptions,
+) {
+  const contextFn = options?.context ?? ((env) => ({}));
+  // @ts-ignore
+  globalThis.__orangeContextFn = contextFn;
+
   wrapLoadersAndActions(serverBuild);
   const handler = createRequestHandler(serverBuild);
   const routeObjects: RouteObject[] = Object.values(serverBuild.routes)
@@ -55,14 +69,19 @@ export function app(serverBuild: ServerBuild) {
   // This is a big ol' hack, but I think it's okay
   const { queryRoute } = createStaticHandler(routeObjects);
 
-  const fetch = async (request: Request, env: unknown, ctx: unknown) => {
+  const fetch = async (
+    request: Request,
+    env: unknown,
+    ctx: ExecutionContext
+  ) => {
     return await _env.run(env, async () => {
-      const requestContext = { cloudflare: { env, ctx } };
+      const baseContext = { cloudflare: { env, ctx } };
+      const context = { ...baseContext, ...(await contextFn(env)) };
       if (request.headers.get("upgrade") === "websocket") {
-        return await queryRoute(request, { requestContext });
+        return await queryRoute(request, { requestContext: context });
       }
 
-      return await handler(request, requestContext);
+      return await handler(request, context);
     });
   };
 
@@ -97,13 +116,15 @@ function wrapLoadersAndActions(build: ServerBuild) {
     const { loader, action } = module;
 
     if (loader) {
-      // @ts-ignore
-      module.loader = (opts: object) => loader({ ...opts, env: _env.getStore() });
+      module.loader = (opts: object) =>
+        // @ts-ignore
+        loader({ ...opts, env: _env.getStore() });
     }
 
     if (action) {
-      // @ts-ignore
-      module.action = (opts: object) => action({ ...opts, env: _env.getStore() });
+      module.action = (opts: object) =>
+        // @ts-ignore
+        action({ ...opts, env: _env.getStore() });
     }
 
     route.module = module;

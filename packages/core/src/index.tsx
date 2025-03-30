@@ -16,22 +16,25 @@ export type CloudflareEnv = Env;
 
 import type * as rr from "react-router";
 
-export type ActionFunctionArgs = rr.ActionFunctionArgs<{
-  cloudflare: { env: CloudflareEnv };
-}> & { env: CloudflareEnv };
+export type ActionFunctionArgs = rr.ActionFunctionArgs<Context> & {
+  env: CloudflareEnv;
+};
 
-export type LoaderFunctionArgs = rr.LoaderFunctionArgs<{
-  cloudflare: { env: CloudflareEnv };
-}> & { env: CloudflareEnv };
+export type LoaderFunctionArgs = rr.LoaderFunctionArgs<Context> & {
+  env: CloudflareEnv;
+};
 
-export function unstable_shouldClone(t: any) {
-  if (t instanceof Response) {
-    return false;
-  }
+export type ContextFrom<T extends () => {}> = Awaited<ReturnType<T>>;
 
-  if (Object.getPrototypeOf(t) === Object.prototype) {
-    return false;
-  }
-
-  return true;
+export interface Context {
+  cloudflare: {
+    env: CloudflareEnv;
+    ctx: ExecutionContext;
+  };
 }
+
+export type ContextWithoutExecutionContext = Omit<Context, "cloudflare"> & {
+  cloudflare: {
+    env: CloudflareEnv;
+  };
+};

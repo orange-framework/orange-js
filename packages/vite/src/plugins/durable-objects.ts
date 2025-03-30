@@ -8,18 +8,26 @@ import _traverse from "@babel/traverse";
 import _generate from "@babel/generator";
 import {
   arrowFunctionExpression,
+  assignmentExpression,
   awaitExpression,
   binaryExpression,
   blockStatement,
   callExpression,
   ClassMethod,
+  expressionStatement,
+  Identifier,
   identifier,
   ifStatement,
   isClassDeclaration,
   isIdentifier,
+  isTSParameterProperty,
   memberExpression,
   objectExpression,
+  objectProperty,
+  Pattern,
+  RestElement,
   returnStatement,
+  spreadElement,
   variableDeclaration,
   variableDeclarator,
 } from "@babel/types";
@@ -87,7 +95,7 @@ export function durableObjectRoutes(ctx: Context): Plugin {
       return {
         code: dataFunctionsSuffix(output.code, className),
         map: output.map,
-      }
+      };
     },
   };
 }
@@ -111,12 +119,44 @@ function updateDataMethod(path: _traverse.NodePath<ClassMethod>): boolean {
     return false;
   }
 
+  const params = node.params.filter(
+    (it): it is Identifier | RestElement | Pattern => !isTSParameterProperty(it)
+  );
   const callToBody = callExpression(
-    arrowFunctionExpression([], node.body, node.async),
-    []
+    arrowFunctionExpression(params, node.body, node.async),
+    [identifier("opts")]
   );
 
+  node.params = [identifier("opts")];
   node.body = blockStatement([
+    expressionStatement(
+      assignmentExpression(
+        "=",
+        memberExpression(identifier("opts"), identifier("context")),
+        objectExpression([
+          spreadElement(
+            awaitExpression(
+              callExpression(
+                memberExpression(
+                  identifier("globalThis"),
+                  identifier("__orangeContextFn")
+                ),
+                [memberExpression(identifier("this"), identifier("env"))]
+              )
+            )
+          ),
+          objectProperty(
+            identifier("cloudflare"),
+            objectExpression([
+              objectProperty(
+                identifier("env"),
+                memberExpression(identifier("this"), identifier("env"))
+              ),
+            ])
+          ),
+        ])
+      )
+    ),
     variableDeclaration("const", [
       variableDeclarator(
         identifier("ret"),
@@ -124,20 +164,17 @@ function updateDataMethod(path: _traverse.NodePath<ClassMethod>): boolean {
       ),
     ]),
     ifStatement(
-      binaryExpression(
-        "instanceof",
-        identifier("ret"),
-        identifier("Response")
-      ),
-      blockStatement([
-        returnStatement(identifier("ret")),
-      ]),
+      binaryExpression("instanceof", identifier("ret"), identifier("Response")),
+      blockStatement([returnStatement(identifier("ret"))])
+    ),
+    ifStatement(
+      binaryExpression("===", identifier("ret"), identifier("undefined")),
+      blockStatement([returnStatement(identifier("ret"))])
     ),
     ifStatement(
       callExpression(
         memberExpression(
           callExpression(
-          
             memberExpression(
               identifier("Object"),
               identifier("getPrototypeOf")
@@ -146,13 +183,9 @@ function updateDataMethod(path: _traverse.NodePath<ClassMethod>): boolean {
           ),
           identifier("isPrototypeOf")
         ),
-        [
-          objectExpression([]),
-        ]
+        [objectExpression([])]
       ),
-      blockStatement([
-        returnStatement(identifier("ret")),
-      ]),
+      blockStatement([returnStatement(identifier("ret"))])
     ),
     returnStatement(
       callExpression(

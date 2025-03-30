@@ -41,7 +41,7 @@ export function internal(): Plugin[] {
       },
       load(id) {
         if (INTERNAL.is(id)) {
-          return emptyExports(["env"]);
+          return emptyExports(["env", "contextFn"]);
         }
       },
     },
