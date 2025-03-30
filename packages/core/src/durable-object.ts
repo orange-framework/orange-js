@@ -151,12 +151,3 @@ export function actionIn<
 ): (args: IdentifierFunctionArgs) => Promise<SerializeLoaderFrom<Obj, Key>> {
   return innerDataIn(durableObject, method, nameGetter);
 }
-
-/**
- * Clones the input object to remove `RpcStub` instances, this prevents
- * rendering issues when used in a route component since `RpcStub`s can't
- * be rendered.
- */
-export function data<T>(data: T): T {
-  return JSON.parse(JSON.stringify(data));
-}

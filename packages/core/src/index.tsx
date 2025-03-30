@@ -5,7 +5,6 @@ export {
   RouteDurableObject,
   useDurableObject,
   actionIn,
-  data,
   loaderIn,
 } from "./durable-object.js";
 export type * from "./durable-object.js";
@@ -24,3 +23,15 @@ export type ActionFunctionArgs = rr.ActionFunctionArgs<{
 export type LoaderFunctionArgs = rr.LoaderFunctionArgs<{
   cloudflare: { env: CloudflareEnv };
 }> & { env: CloudflareEnv };
+
+export function unstable_shouldClone(t: any) {
+  if (t instanceof Response) {
+    return false;
+  }
+
+  if (Object.getPrototypeOf(t) === Object.prototype) {
+    return false;
+  }
+
+  return true;
+}
