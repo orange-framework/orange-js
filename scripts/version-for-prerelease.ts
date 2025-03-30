@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import { execSync } from "node:child_process";
 
 const pkgs = fs.readdirSync("./packages");
-const commitHash = execSync("git rev-parse --short HEAD").toString().trim();
+const commitHash = process.env.PR_SHA!.trim().slice(0, 7);
 
 for (const pkg of pkgs) {
   const pkgPath = `./packages/${pkg}`;
