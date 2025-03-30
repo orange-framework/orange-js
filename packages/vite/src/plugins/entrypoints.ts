@@ -20,6 +20,11 @@ export function entrypoints(ctx: Context): Plugin {
         let body = "";
 
         for (const route of Object.values(routes)) {
+          // Only process JS/TS files
+          if (!/\.(t|j)sx?$/.test(route.file)) {
+            continue;
+          }
+
           const exportedClasses = route.exportedClasses ?? [];
           if (exportedClasses.length === 0) {
             continue;
