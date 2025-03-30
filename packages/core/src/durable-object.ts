@@ -1,20 +1,19 @@
 import { DurableObject, RpcStub } from "cloudflare:workers";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
-import { getAllMethods } from "./util.js";
-import { CloudflareEnv } from "./index.js";
+import { Context, ContextWithoutExecutionContext } from "./index.js";
 
-export type IdentifierFunctionArgs = LoaderFunctionArgs<{
-  cloudflare: { env: CloudflareEnv };
-}>;
+export type IdentifierFunctionArgs = LoaderFunctionArgs<Context>;
 
 export type DurableLoaderFunctionArgs = {
   request: Request;
   params: Params;
+  context: ContextWithoutExecutionContext;
 };
 
 export type DurableActionFunctionArgs = {
   request: Request;
   params: Params;
+  context: ContextWithoutExecutionContext;
 };
 
 export type WebsocketConnectArgs = {
@@ -22,6 +21,7 @@ export type WebsocketConnectArgs = {
   server: WebSocket;
   request: Request;
   params: Params;
+  context: ContextWithoutExecutionContext;
 };
 
 export class RouteDurableObject<Env> extends DurableObject<Env> {
@@ -34,6 +34,8 @@ export class RouteDurableObject<Env> extends DurableObject<Env> {
       this.webSocketConnect &&
       request.headers.get("Upgrade") === "websocket"
     ) {
+      // @ts-ignore
+      const context = await globalThis.__orangeContextFn(this.env);
       const pair = new WebSocketPair();
       const client = pair[0];
       const server = pair[1];
@@ -41,6 +43,7 @@ export class RouteDurableObject<Env> extends DurableObject<Env> {
         client,
         server,
         request,
+        context,
         params: JSON.parse(request.headers.get("x-orange-params") ?? "{}"),
       });
       return resp;
