@@ -1,0 +1,44 @@
+{
+  "name": "@orange-js/cli",
+  "version": "0.1.0",
+  "description": "CLI for Orange.js projects",
+  "bin": {
+    "orange": "./dist/index.js"
+  },
+  "main": "dist/index.js",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "format": "biome format src/**/*.ts --write",
+    "check:lint": "biome lint src/**/*.ts src/**/*.tsx",
+    "check:format": "biome format src/**/*.ts"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "keywords": [],
+  "author": "zeb@zebulon.dev",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "dedent": "^1.5.3",
+    "typescript": "^5.7.2",
+    "vite": "6.2"
+  },
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@react-router/fs-routes": "^7.2.0",
+    "chalk": "^5.4.1",
+    "commander": "^11.1.0",
+    "tsx": "^4.19.2"
+  },
+  "peerDependencies": {
+    "@orange-js/vite": "workspace:*",
+    "vite": "6.2"
+  }
+}

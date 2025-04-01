@@ -38,6 +38,10 @@
     "./workflows": {
       "import": "./dist/workflows.js",
       "types": "./dist/workflows.d.ts"
+    },
+    "./route-module": {
+      "import": "./dist/route-module.js",
+      "types": "./dist/route-module.d.ts"
     }
   },
   "peerDependencies": {
