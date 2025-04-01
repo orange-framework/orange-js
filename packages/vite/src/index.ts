@@ -49,6 +49,14 @@ export default function ({
       cloudflareCfg ?? { viteEnvironment: { name: "ssr" } }
     ) as unknown as Plugin,
     {
+      name: "orange:settings",
+      // @ts-ignore - this is a magic property used for the orange CLI
+      orangeOptions: {
+        apiRoutePatterns,
+        cloudflare: cloudflareCfg,
+      },
+    },
+    {
       name: "orange:route-plugin",
       enforce: "pre",
       async config(userConfig, env) {

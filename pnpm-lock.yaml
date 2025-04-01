@@ -12,6 +12,37 @@ importers:
         specifier: 1.9.4
         version: 1.9.4
 
+  packages/cli:
+    dependencies:
+      '@orange-js/vite':
+        specifier: workspace:*
+        version: link:../vite
+      '@react-router/fs-routes':
+        specifier: ^7.2.0
+        version: 7.2.0(@react-router/dev@7.2.0(@types/node@22.13.0)(react-router@7.2.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(tsx@4.19.2)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.0)(tsx@4.19.2))(wrangler@3.107.2(@cloudflare/workers-types@4.20250129.0)))(typescript@5.7.3)
+      chalk:
+        specifier: ^5.4.1
+        version: 5.4.1
+      commander:
+        specifier: ^11.1.0
+        version: 11.1.0
+      tsx:
+        specifier: ^4.19.2
+        version: 4.19.2
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.0
+        version: 22.13.0
+      dedent:
+        specifier: ^1.5.3
+        version: 1.5.3
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.3
+      vite:
+        specifier: '6.2'
+        version: 6.2.0(@types/node@22.13.0)(tsx@4.19.2)
+
   packages/core:
     dependencies:
       hono:
@@ -1275,6 +1306,10 @@ packages:
   caniuse-lite@1.0.30001696:
     resolution: {integrity: sha512-pDCPkvzfa39ehJtJ+OwGT/2yvT2SbjfHhiIW2LWOAcMQ7BzwxT/XuyUp4OTOd0XFWA6BKw0JalnBHgSi5DGJBQ==}
 
+  chalk@5.4.1:
+    resolution: {integrity: sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+
   chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
 
@@ -1295,6 +1330,10 @@ packages:
 
   command-exists@1.2.9:
     resolution: {integrity: sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==}
+
+  commander@11.1.0:
+    resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
+    engines: {node: '>=16'}
 
   confbox@0.1.8:
     resolution: {integrity: sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w==}
@@ -3030,6 +3069,8 @@ snapshots:
 
   caniuse-lite@1.0.30001696: {}
 
+  chalk@5.4.1: {}
+
   chardet@0.7.0: {}
 
   chokidar@4.0.3:
@@ -3045,6 +3086,8 @@ snapshots:
   color-name@1.1.4: {}
 
   command-exists@1.2.9: {}
+
+  commander@11.1.0: {}
 
   confbox@0.1.8: {}
 

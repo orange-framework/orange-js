@@ -45,7 +45,13 @@ jobs:
         working-directory: packages/create-orange
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          
+
+      - name: Publish cli
+        run: pnpm publish --no-git-checks --tag dev
+        working-directory: packages/cli
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Leave PR comment with install instructions
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
@@ -62,7 +68,7 @@ jobs:
             yarn add @orange-js/orange@0.0.0-${sha} && yarn add -D @orange-js/vite@0.0.0-${sha}
             bun add @orange-js/orange@0.0.0-${sha} && bun add -D @orange-js/vite@0.0.0-${sha}
             \`\`\``;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,

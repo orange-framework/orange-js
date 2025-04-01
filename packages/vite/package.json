@@ -12,6 +12,16 @@
     "check:lint": "biome lint src/**/*.ts src/**/*.tsx",
     "check:format": "biome format src/**/*.ts"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./routes": {
+      "import": "./dist/routes.js",
+      "types": "./dist/routes.d.ts"
+    }
+  },
   "keywords": [],
   "author": "zeb@zebulon.dev",
   "license": "MIT",
