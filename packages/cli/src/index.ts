@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { Command } from "commander";
+import { createCommand } from "@commander-js/extra-typings";
 import { typesCommand } from "./commands/types.js";
 
-const program = new Command();
+const program = createCommand();
 
 program
   .name("orange")

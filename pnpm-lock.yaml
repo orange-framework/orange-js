@@ -14,6 +14,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@commander-js/extra-typings':
+        specifier: ^13.1.0
+        version: 13.1.0(commander@11.1.0)
       '@orange-js/vite':
         specifier: workspace:*
         version: link:../vite
@@ -434,6 +437,11 @@ packages:
 
   '@cloudflare/workers-types@4.20250129.0':
     resolution: {integrity: sha512-H7g/sDB9GaV+fIPf3utNEYncFhryIvDThiBbfZtu0bZmVXcVd9ApP3OMqUYhNV8MShWQASvgWletKKBZGT9/oA==}
+
+  '@commander-js/extra-typings@13.1.0':
+    resolution: {integrity: sha512-q5P52BYb1hwVWE6dtID7VvuJWrlfbCv4klj7BjUUOqMz4jbSZD4C9fJ9lRjL2jnBGTg+gDDlaXN51rkWcLk4fg==}
+    peerDependencies:
+      commander: ~13.1.0
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -2400,6 +2408,10 @@ snapshots:
     optional: true
 
   '@cloudflare/workers-types@4.20250129.0': {}
+
+  '@commander-js/extra-typings@13.1.0(commander@11.1.0)':
+    dependencies:
+      commander: 11.1.0
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:

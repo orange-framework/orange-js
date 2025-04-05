@@ -1,6 +1,7 @@
 import dedent from "dedent";
 import chalk from "chalk";
 import { Command } from "commander";
+import { createCommand } from '@commander-js/extra-typings';
 import { Config, resolveConfig } from "../config.js";
 import { flatRoutes } from "@react-router/fs-routes";
 import { loadRoutes } from "@orange-js/vite/routes";
@@ -8,12 +9,16 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { spawn } from "node:child_process";
 
-export const typesCommand = new Command("types")
+export const typesCommand = createCommand("types")
   .description("Generate TypeScript types for Cloudflare Workers")
-  .action(async () => {
+  .option("--no-wrangler", "Skip generating Wrangler types")
+  .action(async (options) => {
     const config = await resolveConfig();
 
-    await generateWranglerTypes();
+    if (options.wrangler) {
+      await generateWranglerTypes();
+    }
+    
     await generateRouteTypes(config);
   });
 
