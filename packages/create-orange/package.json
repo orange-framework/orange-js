@@ -7,10 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "build:watch": "tsc -w",
-    "format": "biome format src/**/*.ts --write",
-    "check:lint": "biome lint src/**/*.ts src/**/*.tsx",
-    "check:format": "biome format src/**/*.ts"
+    "build:watch": "tsc -w"
   },
   "exports": {
 		".": "./dist/index.js"

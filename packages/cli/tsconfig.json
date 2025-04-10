@@ -4,6 +4,8 @@
     "outDir": "dist",
     "rootDir": "src",
     "types": ["node"],
+    "target": "ES2024",
+    "lib": ["ES2024"],
     "declaration": true
   },
   "include": ["src/**/*"]

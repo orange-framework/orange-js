@@ -20,7 +20,7 @@ declare module "virtual:orange/server-bundle" {
         fetch: (
           request: Request,
           env: unknown,
-          ctx: ExecutionContext
+          ctx: ExecutionContext,
         ) => Promise<Response>;
       };
     }

@@ -43,7 +43,10 @@ type RouteInfo = {
   actionData: unknown;
 };
 
-export type { CreateLoaderData, CreateActionData } from "react-router/route-module";
+export type {
+  CreateLoaderData,
+  CreateActionData,
+} from "react-router/route-module";
 
 export type LinkDescriptors = RR.LinkDescriptors;
 export type LinksFunction = () => LinkDescriptors;

@@ -21,5 +21,5 @@ export function devManifestPlugin(ctx: Context): Plugin {
       const manifest = devAssets(ctx);
       return `window.__reactRouterManifest=${JSON.stringify(manifest)};`;
     },
-  }
+  };
 }

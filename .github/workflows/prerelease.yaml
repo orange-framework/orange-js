@@ -63,10 +63,10 @@ jobs:
 
             Install the prerelease packages with:
             \`\`\`bash
-            npm install @orange-js/orange@0.0.0-${sha} && npm install -D @orange-js/vite@0.0.0-${sha}
-            pnpm add @orange-js/orange@0.0.0-${sha} && pnpm add -D @orange-js/vite@0.0.0-${sha}
-            yarn add @orange-js/orange@0.0.0-${sha} && yarn add -D @orange-js/vite@0.0.0-${sha}
-            bun add @orange-js/orange@0.0.0-${sha} && bun add -D @orange-js/vite@0.0.0-${sha}
+            npm install @orange-js/orange@0.0.0-${sha} && npm install -D @orange-js/vite@0.0.0-${sha} && npm install -D @orange-js/cli@0.0.0-${sha}
+            pnpm add @orange-js/orange@0.0.0-${sha} && pnpm add -D @orange-js/vite@0.0.0-${sha} && pnpm add -D @orange-js/cli@0.0.0-${sha}
+            yarn add @orange-js/orange@0.0.0-${sha} && yarn add -D @orange-js/vite@0.0.0-${sha} && yarn add -D @orange-js/cli@0.0.0-${sha}
+            bun add @orange-js/orange@0.0.0-${sha} && bun add -D @orange-js/vite@0.0.0-${sha} && bun add -D @orange-js/cli@0.0.0-${sha}
             \`\`\``;
 
             github.rest.issues.createComment({
