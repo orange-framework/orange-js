@@ -47,7 +47,8 @@ export function serverBundle(ctx: Context): Plugin {
           `import * as apiRouteModule${index} from "/${route.file}";`,
       );
       const apiRouteLiterals = Object.values(apiRoutes).map(
-        (route, index) => `"${route.path.replaceAll("$", ":")}": apiRouteModule${index}`,
+        (route, index) =>
+          `"${route.path.replaceAll("$", ":")}": apiRouteModule${index}`,
       );
 
       const assets = ctx.clientManifest ? releaseAssets(ctx) : devAssets(ctx);

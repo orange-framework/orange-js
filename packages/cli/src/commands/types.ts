@@ -1,13 +1,14 @@
 import dedent from "dedent";
 import chalk from "chalk";
-import { Command } from "commander";
-import { createCommand } from '@commander-js/extra-typings';
-import { Config, resolveConfig } from "../config.js";
+import { createCommand } from "@commander-js/extra-typings";
 import { flatRoutes } from "@react-router/fs-routes";
 import { loadRoutes } from "@orange-js/vite/routes";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import { spawn } from "node:child_process";
+
+import { Config, resolveConfig } from "../config.js";
+import { exec } from "../exec.js";
+import { step } from "../prompts.js";
 
 export const typesCommand = createCommand("types")
   .description("Generate TypeScript types for Cloudflare Workers")
@@ -16,42 +17,15 @@ export const typesCommand = createCommand("types")
     const config = await resolveConfig();
 
     if (options.wrangler) {
+      step("Generating Wrangler types...");
       await generateWranglerTypes();
     }
-    
+
     await generateRouteTypes(config);
   });
 
-function generateWranglerTypes() {
-  return new Promise<void>((resolve, reject) => {
-    console.log("Generating Wrangler types...");
-    const wrangler = spawn("wrangler", ["types"]);
-    const output: { type: "stdout" | "stderr"; data: string }[] = [];
-
-    wrangler.stdout.on("data", (data) => {
-      output.push({ type: "stdout", data: data.toString() });
-    });
-
-    wrangler.stderr.on("data", (data) => {
-      output.push({ type: "stderr", data: data.toString() });
-    });
-
-    wrangler.on("close", (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        for (const o of output) {
-          if (o.type === "stderr") {
-            process.stderr.write(o.data);
-          } else {
-            process.stdout.write(o.data);
-          }
-        }
-
-        reject(new Error(`wrangler types failed with exit code ${code}`));
-      }
-    });
-  });
+export async function generateWranglerTypes() {
+  await exec("wrangler", ["types"]);
 }
 
 async function generateRouteTypes(config: Config) {
@@ -59,11 +33,11 @@ async function generateRouteTypes(config: Config) {
   const routes = await flatRoutes();
   const { manifest } = loadRoutes(
     routes,
-    config.apiRoutePatterns ?? ["api*.{ts,js}"]
+    config.apiRoutePatterns ?? ["api*.{ts,js}"],
   );
 
   for (const route of Object.values(manifest)) {
-    console.log(`Generating route types for ${chalk.whiteBright(route.file)}`);
+    step(`Generating route types for ${chalk.whiteBright(route.file)}`, true);
     const newPath = route.file.replace(".tsx", ".ts").replace("app", ".types");
 
     const slashes = newPath.split("/").length - 1;
@@ -80,8 +54,8 @@ async function generateRouteTypes(config: Config) {
         import type * as T from "@orange-js/orange/route-module"
 
         type Module = typeof import("${importPrefix}${route.file
-        .replace(".tsx", "")
-        .replace(".jsx", "")}")
+          .replace(".tsx", "")
+          .replace(".jsx", "")}")
 
         export type Info = {
           parents: [],
@@ -118,7 +92,7 @@ async function generateRouteTypes(config: Config) {
       `,
       {
         encoding: "utf-8",
-      }
+      },
     );
   }
 }
