@@ -12,7 +12,7 @@ export function clientBuilder(ctx: Context): Plugin {
       const manifestChunk = bundle[".vite/manifest.json"];
       assert("source" in manifestChunk, "missing manifest chunk");
       const clientManifest: Manifest = JSON.parse(
-        (manifestChunk?.source as string) ?? unreachable()
+        (manifestChunk?.source as string) ?? unreachable(),
       );
 
       ctx.clientManifest = clientManifest;
@@ -20,7 +20,7 @@ export function clientBuilder(ctx: Context): Plugin {
       const manifest = releaseAssets(ctx);
       writeFileSync(
         `${options.dir}/assets/manifest-${manifest.version}.js`,
-        `window.__reactRouterManifest=${JSON.stringify(manifest)};`
+        `window.__reactRouterManifest=${JSON.stringify(manifest)};`,
       );
     },
     applyToEnvironment(environment) {
