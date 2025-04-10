@@ -13,7 +13,7 @@ export interface ServerBuild extends RRServerBuild {
         fetch: (
           request: Request,
           env: unknown,
-          ctx: ExecutionContext
+          ctx: ExecutionContext,
         ) => Promise<Response>;
       };
     }
@@ -46,10 +46,7 @@ export type AppOptions = {
   ) => Omit<Context, "cloudflare"> | Promise<Omit<Context, "cloudflare">>;
 };
 
-export function app(
-  serverBuild: ServerBuild,
-  options?: AppOptions,
-) {
+export function app(serverBuild: ServerBuild, options?: AppOptions) {
   const contextFn = options?.context ?? ((env) => ({}));
   // @ts-ignore
   globalThis.__orangeContextFn = contextFn;
@@ -72,7 +69,7 @@ export function app(
   const fetch = async (
     request: Request,
     env: unknown,
-    ctx: ExecutionContext
+    ctx: ExecutionContext,
   ) => {
     return await _env.run(env, async () => {
       const baseContext = { cloudflare: { env, ctx } };

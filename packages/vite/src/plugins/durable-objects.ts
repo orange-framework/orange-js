@@ -49,7 +49,7 @@ export function durableObjectRoutes(ctx: Context): Plugin {
 
       const routes = ctx.componentRoutes ?? unreachable();
       const routeFiles = Object.values(routes).map((route) =>
-        resolve(route.file)
+        resolve(route.file),
       );
       if (!routeFiles.includes(id)) {
         return;
@@ -87,7 +87,7 @@ export function durableObjectRoutes(ctx: Context): Plugin {
                   },
                 },
                 path.scope,
-                path
+                path,
               );
             }
           }
@@ -125,11 +125,12 @@ function updateDataMethod(path: _traverse.NodePath<ClassMethod>): boolean {
   }
 
   const params = node.params.filter(
-    (it): it is Identifier | RestElement | Pattern => !isTSParameterProperty(it)
+    (it): it is Identifier | RestElement | Pattern =>
+      !isTSParameterProperty(it),
   );
   const callToBody = callExpression(
     arrowFunctionExpression(params, node.body, node.async),
-    [identifier("opts")]
+    [identifier("opts")],
   );
 
   node.params = [identifier("opts")];
@@ -144,37 +145,37 @@ function updateDataMethod(path: _traverse.NodePath<ClassMethod>): boolean {
               callExpression(
                 memberExpression(
                   identifier("globalThis"),
-                  identifier("__orangeContextFn")
+                  identifier("__orangeContextFn"),
                 ),
-                [memberExpression(identifier("this"), identifier("env"))]
-              )
-            )
+                [memberExpression(identifier("this"), identifier("env"))],
+              ),
+            ),
           ),
           objectProperty(
             identifier("cloudflare"),
             objectExpression([
               objectProperty(
                 identifier("env"),
-                memberExpression(identifier("this"), identifier("env"))
+                memberExpression(identifier("this"), identifier("env")),
               ),
-            ])
+            ]),
           ),
-        ])
-      )
+        ]),
+      ),
     ),
     variableDeclaration("const", [
       variableDeclarator(
         identifier("ret"),
-        node.async ? awaitExpression(callToBody) : callToBody
+        node.async ? awaitExpression(callToBody) : callToBody,
       ),
     ]),
     ifStatement(
       binaryExpression("instanceof", identifier("ret"), identifier("Response")),
-      blockStatement([returnStatement(identifier("ret"))])
+      blockStatement([returnStatement(identifier("ret"))]),
     ),
     ifStatement(
       binaryExpression("===", identifier("ret"), identifier("undefined")),
-      blockStatement([returnStatement(identifier("ret"))])
+      blockStatement([returnStatement(identifier("ret"))]),
     ),
     ifStatement(
       callExpression(
@@ -182,15 +183,15 @@ function updateDataMethod(path: _traverse.NodePath<ClassMethod>): boolean {
           callExpression(
             memberExpression(
               identifier("Object"),
-              identifier("getPrototypeOf")
+              identifier("getPrototypeOf"),
             ),
-            [identifier("ret")]
+            [identifier("ret")],
           ),
-          identifier("isPrototypeOf")
+          identifier("isPrototypeOf"),
         ),
-        [objectExpression([])]
+        [objectExpression([])],
       ),
-      blockStatement([returnStatement(identifier("ret"))])
+      blockStatement([returnStatement(identifier("ret"))]),
     ),
     returnStatement(
       callExpression(
@@ -198,10 +199,10 @@ function updateDataMethod(path: _traverse.NodePath<ClassMethod>): boolean {
         [
           callExpression(
             memberExpression(identifier("JSON"), identifier("stringify")),
-            [identifier("ret")]
+            [identifier("ret")],
           ),
-        ]
-      )
+        ],
+      ),
     ),
   ]);
 
@@ -273,7 +274,7 @@ export async function action(args) {
 
 function durableObjectInCode(contents: string): string | undefined {
   const matches = /export\s+class\s+(\w+)\s+extends\s+RouteDurableObject/.exec(
-    contents
+    contents,
   );
   if (!matches || !matches[1]) {
     return undefined;

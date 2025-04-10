@@ -13,20 +13,19 @@ export type Config = {
 
 export async function resolveConfig() {
   const path = join(cwd(), "vite.config.ts");
-    const viteConfig: { default: UserConfig } = await tsImport(
-      path,
-      import.meta.url
+  const viteConfig: { default: UserConfig } = await tsImport(
+    path,
+    import.meta.url,
+  );
+  const orangeSettingsPlugin = viteConfig.default.plugins
+    ?.flat()
+    .find(
+      (p) =>
+        p !== null &&
+        typeof p === "object" &&
+        "name" in p &&
+        p.name === "orange:settings",
     );
-    const orangeSettingsPlugin =
-      viteConfig.default.plugins
-        ?.flatMap((p) => p)
-        .find(
-          (p) =>
-            p !== null &&
-            typeof p === "object" &&
-            "name" in p &&
-            p.name === "orange:settings"
-        );
 
   if (!orangeSettingsPlugin) {
     throw new Error("orange:settings plugin not found");

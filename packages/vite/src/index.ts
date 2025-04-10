@@ -46,7 +46,7 @@ export default function ({
 }: PluginConfig = {}): Plugin[] {
   return [
     cloudflare(
-      cloudflareCfg ?? { viteEnvironment: { name: "ssr" } }
+      cloudflareCfg ?? { viteEnvironment: { name: "ssr" } },
     ) as unknown as Plugin,
     {
       name: "orange:settings",

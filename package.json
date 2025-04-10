@@ -1,12 +1,17 @@
 {
-	"devDependencies": {
-		"@biomejs/biome": "1.9.4"
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome",
-			"esbuild",
-			"workerd"
-		]
-	}
+  "devDependencies": {
+    "@biomejs/biome": "2.0.0-beta.1"
+  },
+  "scripts": {
+    "format": "biome format --write",
+    "check:lint": "biome lint",
+    "check:format": "biome format"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@biomejs/biome",
+      "esbuild",
+      "workerd"
+    ]
+  }
 }

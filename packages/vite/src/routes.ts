@@ -86,7 +86,7 @@ type LoadedRoutes = {
 
 export function loadRoutes(
   routes: RouteConfigEntry[],
-  apiRoutePatterns: string[]
+  apiRoutePatterns: string[],
 ): LoadedRoutes {
   const root: RouteManifestEntry = {
     id: "root",
@@ -114,8 +114,8 @@ export function loadRoutes(
 
   const topLevelApiRoutes = routes.filter((it) =>
     apiRoutePatterns.some((pattern) =>
-      minimatch(it.file.replace("routes/", ""), pattern)
-    )
+      minimatch(it.file.replace("routes/", ""), pattern),
+    ),
   );
   const apiRoutes = topLevelApiRoutes.flatMap(collectApiRoutes);
 
