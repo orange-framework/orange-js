@@ -62,7 +62,10 @@ export function durableObjectRoutes(ctx: Context): Plugin {
 
       const parsed = parse(code, {
         sourceType: "module",
-        plugins: ["typescript", "jsx"],
+        plugins: ["typescript", "jsx", ["decorators", {
+          decoratorsBeforeExport: true,
+          allowCallParenthesized: true,
+        }]],
       });
 
       let wrapped = false;

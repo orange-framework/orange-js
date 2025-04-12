@@ -52,6 +52,10 @@ export function removeDataStubs(ctx: Context): Plugin {
 
       const parsed = parse(code, {
         sourceType: "module",
+        plugins: ["typescript", "jsx", ["decorators", {
+          decoratorsBeforeExport: true,
+          allowCallParenthesized: true,
+        }]],
       });
 
       let stripped = false;
