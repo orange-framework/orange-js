@@ -13,7 +13,8 @@ import { entrypoints } from "./plugins/entrypoints.js";
 import { internal } from "./plugins/internal.js";
 import { routeReload } from "./plugins/route-reload.js";
 import { devManifestPlugin } from "./plugins/dev-manifest.js";
-import { agentsMiddlewareInjector } from "./plugins/agents.js";
+import { agentsMiddlewareInjector, agentsClientStub } from "./plugins/agents.js";
+import { decoratorPlugin } from "./plugins/decorator.js";
 
 export type MiddlewareArgs = {
   request: Request;
@@ -101,6 +102,8 @@ export default function ({
     routeReload(),
     devManifestPlugin(ctx),
     agentsMiddlewareInjector(ctx),
+    agentsClientStub(ctx),
+    decoratorPlugin(),
     ...internal(),
     ...isolation(),
     ...hmr(),
