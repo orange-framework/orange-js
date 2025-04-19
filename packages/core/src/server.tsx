@@ -28,7 +28,7 @@ import { CloudflareEnv, Context } from "./index.js";
 import { createMiddleware } from "hono/factory";
 import { AsyncLocalStorage } from "async_hooks";
 
-const requestContexts: WeakMap<Request, Context> = new WeakMap();
+const requestContexts: Map<Request, Context> = new Map();
 const requestStorage = new AsyncLocalStorage<Request>();
 
 function isProbablyHono(obj: object) {
@@ -135,12 +135,11 @@ export function app(serverBuild: ServerBuild, options?: AppOptions) {
         const baseContext = { cloudflare: { env, ctx } };
         const context = { ...baseContext, ...(await contextFn(env)) };
         requestContexts.set(request, context);
-        const response = await app.fetch(request, env, ctx);
-
-        // Hack to keep the context alive for the duration of the request
-        requestContexts.set(request, { ...context });
-
-        return response;
+        try {
+          return await app.fetch(request, env, ctx);
+        } finally {
+          requestContexts.delete(request);
+        }
       });
     },
   };
