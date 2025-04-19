@@ -24,6 +24,7 @@ export type LoaderFunctionArgs = rr.LoaderFunctionArgs<Context> & {
   env: CloudflareEnv;
 };
 
+// biome-ignore lint/complexity/noBannedTypes: <explanation>
 export type ContextFrom<T extends () => {}> = Awaited<ReturnType<T>>;
 
 export interface Context {
