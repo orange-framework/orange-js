@@ -28,8 +28,7 @@ import { CloudflareEnv, Context } from "./index.js";
 import { createMiddleware } from "hono/factory";
 import { AsyncLocalStorage } from "async_hooks";
 
-const requestContexts: Map<Request, Context> = new Map();
-const requestStorage = new AsyncLocalStorage<Request>();
+const contextStorage = new AsyncLocalStorage<Context>();
 
 function isProbablyHono(obj: object) {
   const honoKeys = [
@@ -79,12 +78,9 @@ export function app(serverBuild: ServerBuild, options?: AppOptions) {
   // This is a big ol' hack, but I think it's okay
   const { queryRoute } = createStaticHandler(routeObjects);
 
-  const fetch = async (
-    request: Request,
-    env: unknown,
-  ) => {
+  const fetch = async (request: Request, env: unknown) => {
     return await _env.run(env, async () => {
-      const context = requestContexts.get(request);
+      const context = contextStorage.getStore();
       if (!context) {
         throw new Error("No context found for request");
       }
@@ -131,16 +127,11 @@ export function app(serverBuild: ServerBuild, options?: AppOptions) {
 
   return {
     async fetch(request: Request, env: CloudflareEnv, ctx: ExecutionContext) {
-      return await requestStorage.run(request, async () => {
-        const baseContext = { cloudflare: { env, ctx } };
-        const context = { ...baseContext, ...(await contextFn(env)) };
-        requestContexts.set(request, context);
-        try {
-          return await app.fetch(request, env, ctx);
-        } finally {
-          requestContexts.delete(request);
-        }
-      });
+      const baseContext = { cloudflare: { env, ctx } };
+      const context = { ...baseContext, ...(await contextFn(env)) };
+      return await contextStorage.run(context, () =>
+        app.fetch(request, env, ctx)
+      );
     },
   };
 }
@@ -178,16 +169,11 @@ function wrapLoadersAndActions(build: ServerBuild) {
  * @returns The context for the current invocation.
  */
 export async function context(): Promise<Context> {
-  const requestInAls = requestStorage.getStore();
-  if (!requestInAls) {
+  const contextInAls = contextStorage.getStore();
+  if (!contextInAls) {
     // @ts-ignore
     return await globalThis.__orangeContextFn(env);
   }
 
-  if (!requestContexts.has(requestInAls)) {
-    // @ts-ignore
-    return await globalThis.__orangeContextFn(env);
-  }
-
-  return requestContexts.get(requestInAls)!;
+  return contextInAls;
 }
