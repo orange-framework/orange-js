@@ -32,3 +32,12 @@ export function mapObject<
   }
   return newObj;
 }
+
+export function isEcmaLike(file: string) {
+  return (
+    file.endsWith(".tsx") ||
+    file.endsWith(".jsx") ||
+    file.endsWith(".ts") ||
+    file.endsWith(".js")
+  );
+}
