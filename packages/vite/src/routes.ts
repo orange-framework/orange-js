@@ -1,40 +1,79 @@
 import fs from "node:fs";
 import { flatRoutes } from "@react-router/fs-routes";
-import { unreachable } from "./util.js";
+import { unreachable, isEcmaLike } from "./util.js";
 import { minimatch } from "minimatch";
+import { parse } from "@babel/parser";
+import _traverse from "@babel/traverse";
+import { isIdentifier } from "@babel/types";
+const traverse = _traverse.default;
 
 // TOOD: use AST for this, this is a hack
 function loadRoute(file: string) {
+  if (!isEcmaLike(file)) {
+    return {
+      hasLoader: false,
+      hasAction: false,
+      hasClientLoader: false,
+      hasClientAction: false,
+    }
+  }
+
   const contents = fs.readFileSync(file, "utf-8");
-  return {
-    hasLoader:
-      contents.includes("async loader(") ||
-      contents.includes("async webSocketConnect(") ||
-      contents.includes("export async function loader") ||
-      contents.includes("export function loader") ||
-      contents.includes("export const loader = ") ||
-      contents.includes("export let loader = "),
-    hasAction:
-      contents.includes("async action(") ||
-      contents.includes("export async function action") ||
-      contents.includes("export function action") ||
-      contents.includes("export const action = ") ||
-      contents.includes("export let action = "),
-    hasClientLoader:
-      contents.includes("export async function clientLoader") ||
-      contents.includes("export function clientLoader") ||
-      contents.includes("export const clientLoader") ||
-      contents.includes("export let clientLoader"),
-    hasClientAction:
-      contents.includes("export async function clientAction") ||
-      contents.includes("export function clientAction") ||
-      contents.includes("export const clientAction") ||
-      contents.includes("export let clientAction"),
-    exportedClasses:
-      contents
-        .match(/export class (\w+)/g)
-        ?.map((it) => it.replace("export class ", "")) ?? [],
+  const ast = parse(contents, {
+    sourceType: "module",
+    plugins: ["typescript", "jsx", "decorators"],
+  });
+
+  const routeInfo = {
+    hasLoader: false,
+    hasAction: false,
+    hasClientLoader: false,
+    hasClientAction: false,
+    exportedClasses: [] as string[],
   };
+
+  traverse(ast, {
+    ExportNamedDeclaration(path) {
+      const node = path.node;
+      const declaration = node.declaration;
+
+      if (declaration === undefined || declaration === null) {
+        return;
+      }
+
+      if (declaration.type === "ClassDeclaration" && declaration.id) {
+        routeInfo.exportedClasses.push(declaration.id.name);
+
+        const members: Record<string, boolean> = {};
+
+        traverse(declaration, {
+          ClassMethod(path) {
+            const node = path.node;
+            if (node.kind === "method" && isIdentifier(node.key)) {
+              members[node.key.name] = node.static;
+            }
+          },
+          ClassProperty(path) {
+            const node = path.node;
+            if (isIdentifier(node.key)) {
+              members[node.key.name] = node.static;
+            }
+          },
+        }, path.scope);
+        
+        // Ensure that the loader and action exist and there is a static id method or property
+        routeInfo.hasLoader ||= "loader" in members && members.id;
+        routeInfo.hasAction ||= "action" in members && members.id;
+      } else if ((declaration.type === "FunctionDeclaration" || declaration.type === "DeclareVariable") && declaration.id) {
+        routeInfo.hasLoader ||= declaration.id.name === "loader";
+        routeInfo.hasAction ||= declaration.id.name === "action";
+        routeInfo.hasClientLoader ||= declaration.id.name === "clientLoader";
+        routeInfo.hasClientAction ||= declaration.id.name === "clientAction";
+      }
+    },
+  });
+
+  return routeInfo;
 }
 
 export interface RouteManifestEntry {
@@ -86,7 +125,7 @@ type LoadedRoutes = {
 
 export function loadRoutes(
   routes: RouteConfigEntry[],
-  apiRoutePatterns: string[],
+  apiRoutePatterns: string[]
 ): LoadedRoutes {
   const root: RouteManifestEntry = {
     id: "root",
@@ -114,8 +153,8 @@ export function loadRoutes(
 
   const topLevelApiRoutes = routes.filter((it) =>
     apiRoutePatterns.some((pattern) =>
-      minimatch(it.file.replace("routes/", ""), pattern),
-    ),
+      minimatch(it.file.replace("routes/", ""), pattern)
+    )
   );
   const apiRoutes = topLevelApiRoutes.flatMap(collectApiRoutes);
 
