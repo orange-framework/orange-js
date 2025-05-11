@@ -69,7 +69,7 @@ export function serverBundle(ctx: Context): Plugin {
       export const assetsBuildDirectory = "dist/client";
       export const assets = ${JSON.stringify(assets, null, 2)};
       export const routes = {${componentRouteLiterals.join(",")}};
-
+      export const routeDiscovery = { mode: "lazy", manifestPath: "/__manifest" };
       export const apiRoutes = {${apiRouteLiterals.join(",")}};
       `;
     },
