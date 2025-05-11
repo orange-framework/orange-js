@@ -59,6 +59,6 @@
   ],
   "dependencies": {
     "hono": "^4.6.20",
-    "react-router": "^7.2.0"
+    "react-router": "=7.2.0"
   }
 }
