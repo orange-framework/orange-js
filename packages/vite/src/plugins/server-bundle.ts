@@ -51,7 +51,7 @@ export function serverBundle(ctx: Context): Plugin {
           `"${route.path.replaceAll("$", ":")}": apiRouteModule${index}`,
       );
 
-      const assets = ctx.clientManifest ? releaseAssets(ctx) : devAssets(ctx);
+      const assets = this.environment.mode === "build" ? releaseAssets(ctx) : devAssets(ctx);
 
       return dedent`
       import * as serverModule from "@orange-js/orange/server-entry";

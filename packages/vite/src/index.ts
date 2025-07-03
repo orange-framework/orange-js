@@ -51,6 +51,21 @@ export default function ({
       cloudflareCfg ?? { viteEnvironment: { name: "ssr" } },
     ) as unknown as Plugin,
     {
+      name: "orange:app-builder",
+      config(config) {
+        return {
+          ...config,
+          builder: {
+            async buildApp(builder) {
+              const { client, ssr } = builder.environments;
+              await builder.build(client);
+              await builder.build(ssr);
+            }
+          }
+        }
+      },
+    },
+    {
       name: "orange:settings",
       // @ts-ignore - this is a magic property used for the orange CLI
       orangeOptions: {
@@ -88,7 +103,7 @@ export default function ({
               "cloudflare:env",
               ...(userConfig.optimizeDeps?.exclude ?? []),
             ],
-          },
+          }
         };
       },
     },
