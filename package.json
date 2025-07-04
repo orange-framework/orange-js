@@ -1,6 +1,10 @@
 {
   "devDependencies": {
-    "@biomejs/biome": "2.0.0-beta.1"
+    "@biomejs/biome": "2.0.0-beta.1",
+    "@playwright/test": "^1.53.2",
+    "@types/node": "^24.0.10",
+    "dedent": "^1.5.3",
+    "get-port": "^7.1.0"
   },
   "scripts": {
     "format": "biome format --write",

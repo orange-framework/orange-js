@@ -1,0 +1,28 @@
+name: E2E Tests
+on:
+  pull_request:
+    branches:
+      - main
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "23.x"
+          registry-url: "https://registry.npmjs.org"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
+
+      - name: Install Playwright
+        run: pnpm exec playwright install
+
+      - name: Run E2E Tests
+        run: pnpm playwright test
