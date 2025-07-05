@@ -3,6 +3,11 @@ import type { CloudflareEnv, Context } from "./index.js";
 
 import type * as RR from "react-router/route-module";
 
+type ReturnTypeOf<
+  T extends RouteModule,
+  Key extends keyof T
+> = T[Key] extends Func ? Awaited<ReturnType<T[Key]>> : never;
+
 type BaseServerArgs<T extends RouteInfo> = {
   params: T["params"];
   context: Context;
@@ -59,11 +64,15 @@ export type HeadersFunction = (args: HeadersArgs) => Headers | HeadersInit;
 
 export type LoaderData<T extends RouteInfo> = RR.CreateLoaderData<T>;
 export type LoaderArgs<T extends RouteInfo> = BaseServerArgs<T>;
-export type ClientLoaderArgs<T extends RouteInfo> = BaseClientArgs<T>;
+export type ClientLoaderArgs<T extends RouteInfo> = BaseClientArgs<T> & {
+  serverLoader: () => Promise<ReturnTypeOf<T["module"], "loader">>;
+};
 
 export type ActionData<T extends RouteInfo> = RR.CreateActionData<T>;
 export type ActionArgs<T extends RouteInfo> = BaseServerArgs<T>;
-export type ClientActionArgs<T extends RouteInfo> = BaseClientArgs<T>;
+export type ClientActionArgs<T extends RouteInfo> = BaseClientArgs<T> & {
+  serverAction: () => Promise<ReturnTypeOf<T["module"], "action">>;
+};
 
 export type Component<T extends RouteInfo> = FC<ComponentProps<T>>;
 export type ComponentProps<T extends RouteInfo> = RR.CreateComponentProps<T>;
