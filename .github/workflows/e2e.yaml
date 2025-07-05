@@ -40,3 +40,19 @@ jobs:
           max-retries: 5 # The maximum number of retries it takes to upload a multipart chunk until it moves on to the next part
           multipart-concurrent: true # Whether to concurrently upload a multipart chunk
           keep-file-fresh: false # defaults to false
+
+      - name: Leave PR comment with test results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const comment = `## E2E Test Results
+            [View the test results](https://playwright.orange-js.dev/run-${{ github.run_id }}-${{ github.run_attempt }}/index.html)`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
