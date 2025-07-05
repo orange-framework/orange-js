@@ -20,11 +20,13 @@ export function internal(): Plugin[] {
       resolveId(id) {
         if (id === "@orange-js/orange/workflows") {
           return EMPTY.id;
+        } else  if (id === "@orange-js/orange/hono") {
+          return EMPTY.id;
         }
       },
       load(id) {
         if (EMPTY.is(id)) {
-          return emptyExports(["start", "get"]);
+          return emptyExports(["start", "get", "variables"]);
         }
       },
     },
