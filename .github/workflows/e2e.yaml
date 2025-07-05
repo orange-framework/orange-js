@@ -25,4 +25,18 @@ jobs:
         run: pnpm exec playwright install
 
       - name: Run E2E Tests
-        run: pnpm playwright test
+        run: pnpm playwright test --reporter=html --trace on
+
+      - uses: ryand56/r2-upload-action@latest # Can be any release
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: playwright-report
+          destination-dir: "run-${{ github.run_id }}-${{ github.run_attempt }}"
+          output-file-url: true # defaults to true
+          multipart-size: 100 # If the file size is greater than the value provided here, then use multipart upload
+          max-retries: 5 # The maximum number of retries it takes to upload a multipart chunk until it moves on to the next part
+          multipart-concurrent: true # Whether to concurrently upload a multipart chunk
+          keep-file-fresh: false # defaults to false
