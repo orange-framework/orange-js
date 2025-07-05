@@ -28,6 +28,7 @@
   "dependencies": {
     "@orange-js/orange": "workspace:",
     "@tailwindcss/vite": "^4.0.14",
+    "hono": "^4.6.20",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.0.14"

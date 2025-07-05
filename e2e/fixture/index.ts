@@ -4,6 +4,8 @@ import * as path from "node:path";
 import * as fs from "node:fs/promises";
 import { test as base, Page } from "@playwright/test";
 import { spawn } from "node:child_process";
+import { Unstable_Config } from "wrangler";
+import { stripVTControlCharacters } from "node:util";
 import { DisposeScope } from "./util";
 
 export type Files = Record<string, string>;
@@ -117,12 +119,15 @@ export async function runCmd({
     await promise;
   }
 
-  return () => commandProcess.kill();
+  return {
+    kill: () => commandProcess.kill(),
+    output: () => output.reduce((acc, { text }) => acc + text, ""),
+  };
 }
 
 export type CreateServer = (files?: Files) => Promise<{ port: number }>;
 
-export const test = base.extend<{ dev: CreateServer; worker: CreateServer }>({
+const orangeTest = base.extend<{ dev: CreateServer; worker: CreateServer }>({
   dev: async ({}, use, testInfo) => {
     const tasks = new DisposeScope();
 
@@ -131,14 +136,17 @@ export const test = base.extend<{ dev: CreateServer; worker: CreateServer }>({
       tasks.register(() => fs.rm(fixtureDir, { force: true, recursive: true }));
 
       const port = await getPort();
-      const server = await runCmd({
+      const devServer = await runCmd({
         cmd: "node_modules/.bin/vite",
         args: ["dev", "--port", port.toString()],
         cwd: fixtureDir,
         waitForText: `localhost:${port}`,
       });
 
-      tasks.register(server);
+      tasks.register(devServer.kill);
+      tasks.register(() =>
+        testInfo.attach("Vite dev server", { body: devServer.output() })
+      );
 
       return { port };
     });
@@ -153,12 +161,16 @@ export const test = base.extend<{ dev: CreateServer; worker: CreateServer }>({
       const fixtureDir = await create(files ?? {}, testInfo.title);
       tasks.register(() => fs.rm(fixtureDir, { force: true, recursive: true }));
 
-      await runCmd({
+      const build = await runCmd({
         cmd: "node_modules/.bin/vite",
         args: ["build"],
         cwd: fixtureDir,
         waitForExit: true,
       });
+      build.kill();
+      tasks.register(() =>
+        testInfo.attach("Vite build", { body: build.output() })
+      );
 
       const port = await getPort();
       const inspectorPort = await getPort();
@@ -175,7 +187,12 @@ export const test = base.extend<{ dev: CreateServer; worker: CreateServer }>({
         waitForText: `localhost:${port}`,
       });
 
-      tasks.register(server);
+      tasks.register(server.kill);
+      tasks.register(() =>
+        testInfo.attach("Wrangler dev server", {
+          body: stripVTControlCharacters(server.output()),
+        })
+      );
       return { port };
     });
 
@@ -184,25 +201,29 @@ export const test = base.extend<{ dev: CreateServer; worker: CreateServer }>({
   },
 });
 
-export function multitest(
+export const test = orangeTest as typeof orangeTest & {
+  multi: typeof multitest;
+};
+
+test.multi = multitest;
+
+function multitest(
   title: string,
   fn: (opts: { page: Page; port: number }) => Promise<void>,
-  files: Files
+  files: Files = {}
 ) {
-  test(`${title} [dev]`, async ({ page, dev }) => {
+  test(`${title} dev`, async ({ page, dev }) => {
     const { port } = await dev(files);
     await fn({ page, port });
   });
 
-  test(`${title} [worker]`, async ({ page, worker }) => {
+  test(`${title} worker`, async ({ page, worker }) => {
     const { port } = await worker(files);
     await fn({ page, port });
   });
 }
 
 export * from "@playwright/test";
-
-import { Unstable_Config } from "wrangler";
 
 const baseConfig = {
   name: "basic",

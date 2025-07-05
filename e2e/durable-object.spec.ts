@@ -1,4 +1,4 @@
-import { test, multitest, expect, wranglerJson } from "./fixture/index";
+import { test, expect, wranglerJson } from "./fixture/index";
 
 const baseFiles = {
   "wrangler.jsonc": wranglerJson({
@@ -38,16 +38,15 @@ export default function Home({}: Route.ComponentProps) {
 }
 `;
 
-test.describe("durable object", () => {
-  multitest(
-    "loader",
-    async ({ page, port }) => {
-      await page.goto(`http://localhost:${port}`);
-      await expect(page.getByText("Hello Durable Object")).toBeVisible();
-    },
-    {
-      ...baseFiles,
-      "app/routes/_index.tsx": `
+test.multi(
+  "loader",
+  async ({ page, port }) => {
+    await page.goto(`http://localhost:${port}`);
+    await expect(page.getByText("Hello Durable Object")).toBeVisible();
+  },
+  {
+    ...baseFiles,
+    "app/routes/_index.tsx": `
       ${mainRoute}
       export class Test extends RouteDurableObject<Env> {
         async loader() {
@@ -60,18 +59,18 @@ test.describe("durable object", () => {
           return "foo";
         }
       }`,
-    }
-  );
+  }
+);
 
-  multitest(
-    "loader with static id",
-    async ({ page, port }) => {
-      await page.goto(`http://localhost:${port}`);
-      await expect(page.getByText("Hello Durable Object")).toBeVisible();
-    },
-    {
-      ...baseFiles,
-      "app/routes/_index.tsx": `
+test.multi(
+  "loader with static id",
+  async ({ page, port }) => {
+    await page.goto(`http://localhost:${port}`);
+    await expect(page.getByText("Hello Durable Object")).toBeVisible();
+  },
+  {
+    ...baseFiles,
+    "app/routes/_index.tsx": `
       ${mainRoute}
       export class Test extends RouteDurableObject<Env> {
         async loader() {
@@ -82,18 +81,18 @@ test.describe("durable object", () => {
 
         static id = "foo";
       }`,
-    }
-  );
+  }
+);
 
-  multitest(
-    "loader with dynamic id",
-    async ({ page, port }) => {
-      await page.goto(`http://localhost:${port}/test/foo`);
-      await expect(page.getByText("Hello foo")).toBeVisible();
-    },
-    {
-      ...baseFiles,
-      "app/routes/test.$test.tsx": `
+test.multi(
+  "loader with dynamic id",
+  async ({ page, port }) => {
+    await page.goto(`http://localhost:${port}/test/foo`);
+    await expect(page.getByText("Hello foo")).toBeVisible();
+  },
+  {
+    ...baseFiles,
+    "app/routes/test.$test.tsx": `
       ${mainRoute}
 
       export class Test extends RouteDurableObject<Env> {
@@ -107,20 +106,20 @@ test.describe("durable object", () => {
           return params.test;
         }
       }`,
-    }
-  );
+  }
+);
 
-  multitest(
-    "action",
-    async ({ page, port }) => {
-      await page.goto(`http://localhost:${port}`);
-      await expect(page.getByText("Hello Durable Object")).toBeVisible();
-      await page.click("#button");
-      await expect(page.getByText("Updated")).toBeVisible();
-    },
-    {
-      ...baseFiles,
-      "app/routes/_index.tsx": `
+test.multi(
+  "action",
+  async ({ page, port }) => {
+    await page.goto(`http://localhost:${port}`);
+    await expect(page.getByText("Hello Durable Object")).toBeVisible();
+    await page.click("#button");
+    await expect(page.getByText("Updated")).toBeVisible();
+  },
+  {
+    ...baseFiles,
+    "app/routes/_index.tsx": `
       ${mainRoute}
       export class Test extends RouteDurableObject<Env> {
         async loader() {
@@ -136,6 +135,5 @@ test.describe("durable object", () => {
 
         static id = "foo";
       }`,
-    }
-  );
-});
+  }
+);
