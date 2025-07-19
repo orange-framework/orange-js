@@ -1,20 +1,20 @@
 import { createMiddleware } from "hono/factory";
-import { app, ServerBuild } from "./server.js";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { HonoBase } from "hono/hono-base";
+import { PropsWithChildren } from "react";
+import * as server from "./server.js";
 
 const vars = new AsyncLocalStorage<any>();
 
-export function handler(serverBuild: ServerBuild) {
-  const orangeApp = app(serverBuild);
+export function handler(
+  layout: (props: PropsWithChildren) => React.ReactNode,
+  options?: server.AppOptions
+) {
+  const orangeApp = server.app(layout, options);
 
   return createMiddleware(async (c) => {
     return vars.run(c.var, () => {
-      return orangeApp.fetch(
-        c.req.raw,
-        c.env,
-        c.executionCtx as ExecutionContext
-      );
+      return orangeApp.fetch(c.req.raw);
     });
   });
 }

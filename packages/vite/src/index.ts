@@ -1,126 +1,91 @@
-import type { Manifest, Plugin } from "vite";
+import type { PluginOption } from "vite";
+
 import { cloudflare } from "@cloudflare/vite-plugin";
-import { ApiRoute, loadRoutes, type RouteManifest } from "./routes.js";
-import { durableObjectRoutes } from "./plugins/durable-objects.js";
-import { workerStub } from "./plugins/worker-stub.js";
-import { clientBuilder, serverBuilder } from "./plugins/build.js";
-import { serverBundle } from "./plugins/server-bundle.js";
-import { hmr } from "./plugins/hmr.js";
-import { flatRoutes } from "@react-router/fs-routes";
+import rsc from "@vitejs/plugin-rsc";
+import react from "@vitejs/plugin-react";
+import * as fs from "node:fs";
+import * as path from "node:path";
+
+import { configPlugin } from "./plugins/config.js";
+import { routesPlugin } from "./plugins/routes.js";
 import { isolation } from "./plugins/isolation.js";
-import { removeDataStubs } from "./plugins/remove-data-stubs.js";
-import { entrypoints } from "./plugins/entrypoints.js";
-import { internal } from "./plugins/internal.js";
-import { routeReload } from "./plugins/route-reload.js";
-import { devManifestPlugin } from "./plugins/dev-manifest.js";
-import { agentsMiddlewareInjector, agentsClientStub } from "./plugins/agents.js";
-import { decoratorPlugin } from "./plugins/decorator.js";
+import { Config, resolveConfig } from "./config.js";
 
-export type MiddlewareArgs = {
-  request: Request;
-  next: () => Promise<Response>;
-};
+export * from "./routing/fs-routes.js";
 
-export type Context = {
-  componentRoutes: RouteManifest | undefined;
-  apiRoutes: ApiRoute[] | undefined;
-  clientManifest: Manifest | undefined;
-};
-
-const ctx: Context = {
-  componentRoutes: undefined,
-  apiRoutes: [],
-  clientManifest: undefined,
-};
-
-export type PluginConfig = {
+export type OrangeRSCPluginOptions = {
   cloudflare?: Parameters<typeof cloudflare>[0];
-  /**
-   * Glob patterns for API routes.
-   * @default ["api*.{ts,js}"]
-   */
-  apiRoutePatterns?: string[];
 };
 
-export default function ({
-  apiRoutePatterns = ["api*.{ts,js}"],
-  cloudflare: cloudflareCfg,
-}: PluginConfig = {}): Plugin[] {
+export default function orange(
+  options: OrangeRSCPluginOptions
+): PluginOption[] {
+  let _config: Config;
+
+  const config = () => _config;
+
   return [
-    cloudflare(
-      cloudflareCfg ?? { viteEnvironment: { name: "ssr" } },
-    ) as unknown as Plugin,
-    {
-      name: "orange:app-builder",
-      config(config) {
-        return {
-          ...config,
-          builder: {
-            async buildApp(builder) {
-              const { client, ssr } = builder.environments;
-              await builder.build(client);
-              await builder.build(ssr);
-            }
-          }
-        }
-      },
-    },
     {
       name: "orange:settings",
       // @ts-ignore - this is a magic property used for the orange CLI
       orangeOptions: {
-        apiRoutePatterns,
-        cloudflare: cloudflareCfg,
+        cloudflare: options.cloudflare,
+      },
+      async config() {
+        _config = await resolveConfig();
       },
     },
-    {
-      name: "orange:route-plugin",
-      enforce: "pre",
-      async config(userConfig, env) {
-        globalThis.__reactRouterAppDirectory = "app";
-        const routes = await flatRoutes();
-        const { manifest, apiRoutes } = loadRoutes(routes, apiRoutePatterns);
-        ctx.componentRoutes = manifest;
-        ctx.apiRoutes = apiRoutes;
-
-        if (env.mode === "production") {
-          return;
-        }
-
-        return {
-          ...userConfig,
-          build: {
-            ...userConfig.build,
-            rollupOptions: {
-              ...userConfig.build?.rollupOptions,
-              external: ["cloudflare:workers"],
-            },
-          },
-          optimizeDeps: {
-            ...userConfig.optimizeDeps,
-            exclude: [
-              "cloudflare:workers",
-              "cloudflare:env",
-              ...(userConfig.optimizeDeps?.exclude ?? []),
-            ],
-          }
-        };
+    isolation(),
+    configPlugin(),
+    react({
+      babel: {
+        plugins: [
+          ["@babel/plugin-proposal-decorators", { version: "2023-11" }],
+        ],
       },
-    },
-    clientBuilder(ctx),
-    serverBuilder(ctx),
-    workerStub(),
-    durableObjectRoutes(ctx),
-    entrypoints(ctx),
-    serverBundle(ctx),
-    removeDataStubs(ctx),
-    routeReload(),
-    devManifestPlugin(ctx),
-    agentsMiddlewareInjector(ctx),
-    agentsClientStub(ctx),
-    decoratorPlugin(),
-    ...internal(),
-    ...isolation(),
-    ...hmr(),
+    }),
+    rsc({
+      entries: {
+        client: entrypoint(
+          "entry.browser",
+          "node_modules/@orange-js/vite/dist/entrypoints/entry.browser.js"
+        ),
+        ssr: entrypoint(
+          "entry.ssr",
+          "node_modules/@orange-js/vite/dist/entrypoints/entry.ssr.js"
+        ),
+        // rsc: entrypoint(
+        //   "entry.rsc",
+        //   "node_modules/@orange-js/vite/dist/entrypoints/entry.rsc.js"
+        // ),
+      },
+      serverHandler: false,
+      loadModuleDevProxy: true,
+    }),
+    cloudflare(
+      options.cloudflare ?? {
+        configPath: "./wrangler.jsonc",
+        viteEnvironment: {
+          name: "rsc",
+        },
+      }
+    ),
+    routesPlugin(config),
   ];
+}
+
+function entrypoint(name: string, fallback: string) {
+  for (const extension of ["tsx", "jsx"]) {
+    const entrypoint = path.join(
+      process.cwd(),
+      "src",
+      "entrypoints",
+      `${name}.${extension}`
+    );
+    if (fs.existsSync(entrypoint)) {
+      return entrypoint;
+    }
+  }
+
+  return fallback;
 }

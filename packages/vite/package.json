@@ -1,7 +1,7 @@
 {
   "name": "@orange-js/vite",
   "type": "module",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,6 +17,10 @@
     "./routes": {
       "import": "./dist/routes.js",
       "types": "./dist/routes.d.ts"
+    },
+    "./config": {
+      "import": "./dist/config.js",
+      "types": "./dist/config.d.ts"
     }
   },
   "keywords": [],
@@ -33,16 +37,19 @@
   "dependencies": {
     "@babel/generator": "^7.26.5",
     "@babel/parser": "^7.26.7",
+    "@babel/plugin-proposal-decorators": "^7.28.0",
     "@babel/traverse": "^7.26.7",
     "@babel/types": "^7.26.7",
     "@cloudflare/vite-plugin": "^1.9.0",
-    "@react-router/dev": "^7.2.0",
-    "@react-router/fs-routes": "^7.2.0",
     "@swc-node/core": "^1.13.3",
+    "@vitejs/plugin-react": "^4.7.0",
+    "@vitejs/plugin-rsc": "^0.4.12",
     "dedent": "^1.5.3",
     "es-module-lexer": "^1.6.0",
     "minimatch": "^10.0.1",
-    "react-refresh": "^0.16.0"
+    "react-refresh": "^0.16.0",
+    "vite-node": "^3.2.4",
+    "vitest": "^3.2.4"
   },
   "files": [
     "dist",

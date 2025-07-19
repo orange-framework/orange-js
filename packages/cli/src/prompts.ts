@@ -24,31 +24,31 @@ export const orange = (text: string) => c.rgb(249, 115, 22)(text);
 const unicode = isUnicodeSupported();
 const s = (c: string, fallback: string) => (unicode ? c : fallback);
 
-const S_STEP_ACTIVE = s('◆', '*');
-const S_STEP_CANCEL = s('■', 'x');
-const S_STEP_ERROR = s('▲', 'x');
-const S_STEP_SUBMIT = s('◇', 'o');
+const S_STEP_ACTIVE = s("◆", "*");
+const S_STEP_CANCEL = s("■", "x");
+const S_STEP_ERROR = s("▲", "x");
+const S_STEP_SUBMIT = s("◇", "o");
 
-const S_BAR_START = s('┌', 'T');
-const S_BAR = s('│', '|');
-const S_BAR_END = s('└', '—');
+const S_BAR_START = s("┌", "T");
+const S_BAR = s("│", "|");
+const S_BAR_END = s("└", "—");
 
-const S_RADIO_ACTIVE = s('●', '>');
-const S_RADIO_INACTIVE = s('○', ' ');
-const S_CHECKBOX_ACTIVE = s('◻', '[•]');
-const S_CHECKBOX_SELECTED = s('◼', '[+]');
-const S_CHECKBOX_INACTIVE = s('◻', '[ ]');
-const S_PASSWORD_MASK = s('▪', '•');
+const S_RADIO_ACTIVE = s("●", ">");
+const S_RADIO_INACTIVE = s("○", " ");
+const S_CHECKBOX_ACTIVE = s("◻", "[•]");
+const S_CHECKBOX_SELECTED = s("◼", "[+]");
+const S_CHECKBOX_INACTIVE = s("◻", "[ ]");
+const S_PASSWORD_MASK = s("▪", "•");
 
-const S_BAR_H = s('─', '-');
-const S_CORNER_TOP_RIGHT = s('╮', '+');
-const S_CONNECT_LEFT = s('├', '+');
-const S_CORNER_BOTTOM_RIGHT = s('╯', '+');
+const S_BAR_H = s("─", "-");
+const S_CORNER_TOP_RIGHT = s("╮", "+");
+const S_CONNECT_LEFT = s("├", "+");
+const S_CORNER_BOTTOM_RIGHT = s("╯", "+");
 
-const S_INFO = s('●', '•');
-const S_SUCCESS = s('◆', '*');
-const S_WARN = s('▲', '!');
-const S_ERROR = s('■', 'x');
+const S_INFO = s("●", "•");
+const S_SUCCESS = s("◆", "*");
+const S_WARN = s("▲", "!");
+const S_ERROR = s("■", "x");
 
 const symbol = (state: State) => {
   switch (state) {
@@ -472,123 +472,128 @@ export function spinner({
   };
 }
 
-
 export interface MultiSelectOptions<Value> extends CommonOptions {
-	message: string;
-	options: Option<Value>[];
-	initialValues?: Value[];
-	maxItems?: number;
-	required?: boolean;
-	cursorAt?: Value;
+  message: string;
+  options: Option<Value>[];
+  initialValues?: Value[];
+  maxItems?: number;
+  required?: boolean;
+  cursorAt?: Value;
 }
 export const multiselect = <Value>(opts: MultiSelectOptions<Value>) => {
-	const opt = (
-		option: Option<Value>,
-		state: 'inactive' | 'active' | 'selected' | 'active-selected' | 'submitted' | 'cancelled'
-	) => {
-		const label = option.label ?? String(option.value);
-		if (state === 'active') {
-			return `${orange(S_CHECKBOX_ACTIVE)} ${label} ${
-				option.hint ? c.dim(`(${option.hint})`) : ''
-			}`;
-		}
-		if (state === 'selected') {
-			return `${orange(S_CHECKBOX_SELECTED)} ${c.dim(label)} ${
-				option.hint ? c.dim(`(${option.hint})`) : ''
-			}`;
-		}
-		if (state === 'cancelled') {
-			return `${c.strikethrough(c.dim(label))}`;
-		}
-		if (state === 'active-selected') {
-			return `${orange(S_CHECKBOX_SELECTED)} ${label} ${
-				option.hint ? c.dim(`(${option.hint})`) : ''
-			}`;
-		}
-		if (state === 'submitted') {
-			return `${c.dim(label)}`;
-		}
-		return `${c.dim(S_CHECKBOX_INACTIVE)} ${c.dim(label)}`;
-	};
+  const opt = (
+    option: Option<Value>,
+    state:
+      | "inactive"
+      | "active"
+      | "selected"
+      | "active-selected"
+      | "submitted"
+      | "cancelled",
+  ) => {
+    const label = option.label ?? String(option.value);
+    if (state === "active") {
+      return `${orange(S_CHECKBOX_ACTIVE)} ${label} ${
+        option.hint ? c.dim(`(${option.hint})`) : ""
+      }`;
+    }
+    if (state === "selected") {
+      return `${orange(S_CHECKBOX_SELECTED)} ${c.dim(label)} ${
+        option.hint ? c.dim(`(${option.hint})`) : ""
+      }`;
+    }
+    if (state === "cancelled") {
+      return `${c.strikethrough(c.dim(label))}`;
+    }
+    if (state === "active-selected") {
+      return `${orange(S_CHECKBOX_SELECTED)} ${label} ${
+        option.hint ? c.dim(`(${option.hint})`) : ""
+      }`;
+    }
+    if (state === "submitted") {
+      return `${c.dim(label)}`;
+    }
+    return `${c.dim(S_CHECKBOX_INACTIVE)} ${c.dim(label)}`;
+  };
 
-	return new MultiSelectPrompt({
-		options: opts.options,
-		input: opts.input,
-		output: opts.output,
-		initialValues: opts.initialValues,
-		required: opts.required ?? true,
-		cursorAt: opts.cursorAt,
-		validate(selected: Value[]) {
-			if (this.required && selected.length === 0)
-				return `Please select at least one option.\n${c.reset(
-					c.dim(
-						`Press ${c.gray(c.bgWhite(c.inverse(' space ')))} to select, ${c.gray(
-							c.bgWhite(c.inverse(' enter '))
-						)} to submit`
-					)
-				)}`;
-		},
-		render() {
-      const active = this.state === 'active' || this.state === 'initial';
-			const title = `${c.gray(S_BAR)}\n${symbol(this.state)}  ${opts.message}\n`;
+  return new MultiSelectPrompt({
+    options: opts.options,
+    input: opts.input,
+    output: opts.output,
+    initialValues: opts.initialValues,
+    required: opts.required ?? true,
+    cursorAt: opts.cursorAt,
+    validate(selected: Value[]) {
+      if (this.required && selected.length === 0)
+        return `Please select at least one option.\n${c.reset(
+          c.dim(
+            `Press ${c.gray(c.bgWhite(c.inverse(" space ")))} to select, ${c.gray(
+              c.bgWhite(c.inverse(" enter ")),
+            )} to submit`,
+          ),
+        )}`;
+    },
+    render() {
+      const active = this.state === "active" || this.state === "initial";
+      const title = `${c.gray(S_BAR)}\n${symbol(this.state)}  ${opts.message}\n`;
       const controls = `${active ? orange(S_BAR) : c.gray(S_BAR)}  ${c.dim("(space to select, enter to submit)")}\n`;
 
-			const styleOption = (option: Option<Value>, active: boolean) => {
-				const selected = this.value.includes(option.value);
-				if (active && selected) {
-					return opt(option, 'active-selected');
-				}
-				if (selected) {
-					return opt(option, 'selected');
-				}
-				return opt(option, active ? 'active' : 'inactive');
-			};
+      const styleOption = (option: Option<Value>, active: boolean) => {
+        const selected = this.value.includes(option.value);
+        if (active && selected) {
+          return opt(option, "active-selected");
+        }
+        if (selected) {
+          return opt(option, "selected");
+        }
+        return opt(option, active ? "active" : "inactive");
+      };
 
-			switch (this.state) {
-				case 'submit': {
-					return `${title}${controls}${c.gray(S_BAR)}  ${
-						this.options
-							.filter(({ value }) => this.value.includes(value))
-							.map((option) => opt(option, 'submitted'))
-							.join(c.dim(', ')) || c.dim('none')
-					}`;
-				}
-				case 'cancel': {
-					const label = this.options
-						.filter(({ value }) => this.value.includes(value))
-						.map((option) => opt(option, 'cancelled'))
-						.join(c.dim(', '));
-					return `${title}${controls}${c.gray(S_BAR)}  ${
-						label.trim() ? `${label}\n${c.gray(S_BAR)}` : ''
-					}`;
-				}
-				case 'error': {
-					const footer = this.error
-						.split('\n')
-						.map((ln, i) =>
-							i === 0 ? `${c.yellow(S_BAR_END)}  ${c.yellow(ln)}` : `   ${ln}`
-						)
-						.join('\n');
-					return `${title + controls + c.yellow(S_BAR)}  ${limitOptions({
-						output: opts.output,
-						options: this.options,
-						cursor: this.cursor,
-						maxItems: opts.maxItems,
-						style: styleOption,
-					}).join(`\n${c.yellow(S_BAR)}  `)}\n${footer}\n`;
-				}
-				default: {
-					return `${title}${controls}${orange(S_BAR)}  ${limitOptions({
-						output: opts.output,
-						options: this.options,
-						cursor: this.cursor,
-						maxItems: opts.maxItems,
-						style: styleOption,
-					}).join(`\n${orange(S_BAR)}  `)}\n${orange(S_BAR_END)}\n`;
-				}
-			}
-		},
-	}).prompt() as Promise<Value[] | symbol>;
+      switch (this.state) {
+        case "submit": {
+          return `${title}${controls}${c.gray(S_BAR)}  ${
+            this.options
+              .filter(({ value }) => this.value.includes(value))
+              .map((option) => opt(option, "submitted"))
+              .join(c.dim(", ")) || c.dim("none")
+          }`;
+        }
+        case "cancel": {
+          const label = this.options
+            .filter(({ value }) => this.value.includes(value))
+            .map((option) => opt(option, "cancelled"))
+            .join(c.dim(", "));
+          return `${title}${controls}${c.gray(S_BAR)}  ${
+            label.trim() ? `${label}\n${c.gray(S_BAR)}` : ""
+          }`;
+        }
+        case "error": {
+          const footer = this.error
+            .split("\n")
+            .map((ln, i) =>
+              i === 0 ? `${c.yellow(S_BAR_END)}  ${c.yellow(ln)}` : `   ${ln}`,
+            )
+            .join("\n");
+          return `${title + controls + c.yellow(S_BAR)}  ${limitOptions({
+            output: opts.output,
+            options: this.options,
+            cursor: this.cursor,
+            maxItems: opts.maxItems,
+            style: styleOption,
+          }).join(`\n${c.yellow(S_BAR)}  `)}\n${footer}\n`;
+        }
+        default: {
+          return `${title}${controls}${orange(S_BAR)}  ${limitOptions({
+            output: opts.output,
+            options: this.options,
+            cursor: this.cursor,
+            maxItems: opts.maxItems,
+            style: styleOption,
+          }).join(`\n${orange(S_BAR)}  `)}\n${orange(S_BAR_END)}\n`;
+        }
+      }
+    },
+  }).prompt() as Promise<Value[] | symbol>;
 };
 
 export async function loader<T>(

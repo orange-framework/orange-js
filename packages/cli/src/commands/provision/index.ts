@@ -8,13 +8,13 @@ import { readAccountId } from "../../wrangler.js";
 import { provisionPostgres } from "./postgres.js";
 import { provisionSqlite } from "./sqlite.js";
 import { provisionBucket } from "./object-storage.js";
-import { provisionDurableObjects } from "./durable-objects.js";
+// import { provisionDurableObjects } from "./durable-objects.js";
 import { provisionKv } from "./kv.js";
 
 export function provisionCommand(client: Cloudflare) {
   return createCommand("provision")
     .description("Provision Cloudflare resources for your project")
-    .option("-d, --durable-objects", "Provision Durable Objects")
+    // .option("-d, --durable-objects", "Provision Durable Objects")
     .option("-k, --kv", "Provision Key-Value Store")
     .option("-s, --sqlite", "Provision SQLite Database")
     .option("-D, --d1", "Provision D1 Database")
@@ -34,13 +34,13 @@ export function provisionCommand(client: Cloudflare) {
       } else if (selectedResource === "kv") {
         await provisionKv(client, accountId);
       } else if (selectedResource === "durable-objects") {
-        await provisionDurableObjects();
+        // await provisionDurableObjects();
       }
     });
 }
 
 async function determineResource(options: {
-  durableObjects?: true;
+  // durableObjects?: true;
   kv?: true;
   sqlite?: true;
   d1?: true;
@@ -48,9 +48,9 @@ async function determineResource(options: {
   r2?: true;
   postgres?: true;
 }): Promise<string> {
-  if (options.durableObjects) {
-    return "durable-objects";
-  }
+  // if (options.durableObjects) {
+  //   return "durable-objects";
+  // }
 
   if (options.kv) {
     return "kv";
@@ -73,7 +73,7 @@ async function determineResource(options: {
     { title: "Key-Value Store", value: "kv" },
     { title: "SQLite Database", value: "sqlite" },
     { title: "Postgres Database", value: "postgres" },
-    { title: "Durable Objects", value: "durable-objects" },
+    // { title: "Durable Objects", value: "durable-objects" },
   ];
 
   const selectedResource = await select({

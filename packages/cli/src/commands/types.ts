@@ -1,12 +1,10 @@
 import dedent from "dedent";
 import chalk from "chalk";
 import { createCommand } from "@commander-js/extra-typings";
-import { flatRoutes } from "@react-router/fs-routes";
-import { loadRoutes } from "@orange-js/vite/routes";
+import { ResolvedConfig, resolveConfig } from "@orange-js/vite/config";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 
-import { Config, resolveConfig } from "../config.js";
 import { exec } from "../exec.js";
 import { step } from "../prompts.js";
 
@@ -28,21 +26,16 @@ export async function generateWranglerTypes() {
   await exec("wrangler", ["types"]);
 }
 
-async function generateRouteTypes(config: Config) {
-  globalThis.__reactRouterAppDirectory = "app";
-  const routes = await flatRoutes();
-  const { manifest } = loadRoutes(
-    routes,
-    config.apiRoutePatterns ?? ["api*.{ts,js}"],
-  );
+async function generateRouteTypes(config: ResolvedConfig) {
+  const routes = config.routes;
 
-  for (const route of Object.values(manifest)) {
+  for (const route of routes) {
     step(`Generating route types for ${chalk.whiteBright(route.file)}`, true);
     const newPath = route.file.replace(".tsx", ".ts").replace("app", ".types");
 
     const slashes = newPath.split("/").length - 1;
     const importPrefix = "../".repeat(slashes);
-    const params = paramsForPath(route.path ?? "");
+    const params = paramsForPath(route.pattern);
     const paramsLiteral = `{ ${params
       .map((param) => `"${param}": string`)
       .join(", ")} }`;
@@ -54,14 +47,11 @@ async function generateRouteTypes(config: Config) {
         import type * as T from "@orange-js/orange/route-module"
 
         type Module = typeof import("${importPrefix}${route.file
-          .replace(".tsx", "")
-          .replace(".jsx", "")}")
+        .replace(".tsx", "")
+        .replace(".jsx", "")}")
 
         export type Info = {
           parents: [],
-          id: "${route.id}"
-          file: "${route.file}"
-          path: "${route.path}"
           params: ${paramsLiteral} & { [key: string]: string | undefined }
           module: Module
           loaderData: T.CreateLoaderData<Module>
@@ -92,7 +82,7 @@ async function generateRouteTypes(config: Config) {
       `,
       {
         encoding: "utf-8",
-      },
+      }
     );
   }
 }
