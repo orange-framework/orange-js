@@ -18,7 +18,7 @@ export type OrangeRSCPluginOptions = {
 };
 
 export default function orange(
-  options: OrangeRSCPluginOptions
+  options: OrangeRSCPluginOptions = {}
 ): PluginOption[] {
   let _config: Config;
 
