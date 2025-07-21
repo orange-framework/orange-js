@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "basic",
-  "main": "./app/entry.server.ts",
+  "main": "./app/entry.server.tsx",
   "compatibility_date": "2025-05-11",
   "compatibility_flags": ["nodejs_compat"],
   // Where the static asses built by Vite will be served out of.
