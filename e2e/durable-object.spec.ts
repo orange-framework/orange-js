@@ -46,7 +46,7 @@ test.multi(
   },
   {
     ...baseFiles,
-    "app/routes/_index.tsx": `
+    "app/routes/index.tsx.tsx": `
       ${mainRoute}
       export class Test extends RouteDurableObject<Env> {
         async loader() {
@@ -70,7 +70,7 @@ test.multi(
   },
   {
     ...baseFiles,
-    "app/routes/_index.tsx": `
+    "app/routes/index.tsx.tsx": `
       ${mainRoute}
       export class Test extends RouteDurableObject<Env> {
         async loader() {
@@ -119,7 +119,7 @@ test.multi(
   },
   {
     ...baseFiles,
-    "app/routes/_index.tsx": `
+    "app/routes/index.tsx.tsx": `
       ${mainRoute}
       export class Test extends RouteDurableObject<Env> {
         async loader() {

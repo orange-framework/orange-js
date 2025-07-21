@@ -7,15 +7,15 @@ test.multi(
     await expect(page.getByText("Hello World")).toBeVisible();
   },
   {
-    "app/routes/_index.tsx": `
-      export default function Index() {
+    "app/routes/index.tsx.tsx": `
+      export default async function Index() {
         return <div>Hello World</div>;
       }
     `,
-    "app/entry.server.ts": `
+    "app/entry.server.tsx": `
       import { Hono } from "hono";
       import { handler } from "@orange-js/orange/hono";
-      import * as serverBuild from "virtual:orange/server-bundle";
+      import { Root } from "./root";  
 
       const app = new Hono();
 
@@ -23,7 +23,7 @@ test.multi(
       app.get("/api/status", (c) => c.json({ status: "ok" }));
 
       // Use the handler to create middleware for React routing
-      app.use("*", handler(serverBuild));
+      app.use("*", handler(Root));
 
       export default app;
     `,
@@ -37,15 +37,15 @@ test.multi(
     await expect(page.getByText('{"status":"ok"}')).toBeVisible();
   },
   {
-    "app/routes/_index.tsx": `
-      export default function Index() {
+    "app/routes/index.tsx.tsx": `
+      export default async function Index() {
         return <div>Hello World</div>;
       }
     `,
-    "app/entry.server.ts": `
+    "app/entry.server.tsx": `
       import { Hono } from "hono";
       import { handler } from "@orange-js/orange/hono";
-      import * as serverBuild from "virtual:orange/server-bundle";
+      import { Root } from "./root";
 
       const app = new Hono();
 
@@ -53,7 +53,7 @@ test.multi(
       app.get("/api/status", (c) => c.json({ status: "ok" }));
 
       // Use the handler to create middleware for React routing
-      app.use("*", handler(serverBuild));
+      app.use("*", handler(Root));
 
       export default app;
     `,
@@ -70,15 +70,15 @@ test.multi(
     await expect(page.getByText('{"version":"1.0.0"}')).toBeVisible();
   },
   {
-    "app/routes/_index.tsx": `
-      export default function Index() {
+    "app/routes/index.tsx.tsx": `
+      export default async function Index() {
         return <div>Hello World</div>;
       }
     `,
-    "app/entry.server.ts": `
+    "app/entry.server.tsx": `
       import { Hono } from "hono";
       import { handler } from "@orange-js/orange/hono";
-      import * as serverBuild from "virtual:orange/server-bundle";
+      import { Root } from "./root";
 
       const app = new Hono();
 
@@ -87,7 +87,7 @@ test.multi(
       app.get("/api/version", (c) => c.json({ version: "1.0.0" }));
 
       // Use the handler to create middleware for React routing
-      app.use("*", handler(serverBuild));
+      app.use("*", handler(Root));
 
       export default app;
     `,
@@ -112,15 +112,15 @@ test.multi(
     expect(response).toEqual({ echo: "test" });
   },
   {
-    "app/routes/_index.tsx": `
-      export default function Index() {
+    "app/routes/index.tsx.tsx": `
+      export default async function Index() {
         return <div>Hello World</div>;
       }
     `,
-    "app/entry.server.ts": `
+    "app/entry.server.tsx": `
       import { Hono } from "hono";
       import { handler } from "@orange-js/orange/hono";
-      import * as serverBuild from "virtual:orange/server-bundle";
+      import { Root } from "./root";
 
       const app = new Hono();
 
@@ -131,7 +131,7 @@ test.multi(
       });
 
       // Use the handler to create middleware for React routing
-      app.use("*", handler(serverBuild));
+      app.use("*", handler(Root));
 
       export default app;
     `,
@@ -145,8 +145,8 @@ test.multi(
     await expect(page.getByText("About Page")).toBeVisible();
   },
   {
-    "app/routes/_index.tsx": `
-      export default function Index() {
+    "app/routes/index.tsx.tsx": `
+      export default async function Index() {
         return <div>Hello World</div>;
       }
     `,
@@ -155,10 +155,10 @@ test.multi(
         return <div>About Page</div>;
       }
     `,
-    "app/entry.server.ts": `
+    "app/entry.server.tsx": `
       import { Hono } from "hono";
       import { handler } from "@orange-js/orange/hono";
-      import * as serverBuild from "virtual:orange/server-bundle";
+      import { Root } from "./root";
 
       const app = new Hono();
 
@@ -166,7 +166,7 @@ test.multi(
       app.get("/api/info", (c) => c.json({ info: "available" }));
 
       // Use the handler to create middleware for React routing
-      app.use("*", handler(serverBuild));
+      app.use("*", handler(Root));
 
       export default app;
     `,
@@ -182,21 +182,16 @@ test.multi(
   {
     "app/routes/variables.tsx": `
       import { variables } from "@orange-js/orange/hono";
-      import { useLoaderData } from "@orange-js/orange";
 
-      export async function loader() {
-        return variables();
-      }
-
-      export default function Index() {
-        const { test } = useLoaderData();
+      export default async function Index() {
+        const { test } = variables();
         return <pre>{JSON.stringify(test)}</pre>;
       }
     `,
-    "app/entry.server.ts": `
+    "app/entry.server.tsx": `
       import { Hono } from "hono";
       import { handler } from "@orange-js/orange/hono";
-      import * as serverBuild from "virtual:orange/server-bundle";
+      import { Root } from "./root";
 
       const app = new Hono();
 
@@ -209,7 +204,7 @@ test.multi(
       });
 
       // Use the handler to create middleware for React routing
-      app.use("*", handler(serverBuild));
+      app.use("*", handler(Root));
 
       export default app;
     `,

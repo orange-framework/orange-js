@@ -227,7 +227,7 @@ export * from "@playwright/test";
 
 const baseConfig = {
   name: "basic",
-  main: "./app/entry.server.ts",
+  main: "./app/entry.server.tsx",
   compatibility_date: "2025-05-11",
   compatibility_flags: ["nodejs_compat"],
   assets: {
