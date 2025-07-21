@@ -8,7 +8,7 @@ const vars = new AsyncLocalStorage<any>();
 
 export function handler(
   layout: (props: PropsWithChildren) => React.ReactNode,
-  options?: server.AppOptions
+  options?: server.AppOptions,
 ) {
   const orangeApp = server.app(layout, options);
 
@@ -26,7 +26,7 @@ type ExtractEnv<T> = T extends HonoBase<infer Env>
   : never;
 
 export function variables<
-  App extends HonoBase<any, any, any>
+  App extends HonoBase<any, any, any>,
 >(): ExtractEnv<App> {
   const state = vars.getStore();
   if (!state) {

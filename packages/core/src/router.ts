@@ -3,7 +3,7 @@ export type Route = {
 };
 
 export function router<T extends Route>(
-  routes: T[]
+  routes: T[],
 ): (request: Request) => T | undefined {
   return (request: Request) => {
     const url = new URL(request.url);

@@ -22,7 +22,7 @@ export interface Context {
 
 export type AppOptions = {
   context?: (
-    env: CloudflareEnv
+    env: CloudflareEnv,
   ) => Omit<Context, "cloudflare"> | Promise<Omit<Context, "cloudflare">>;
 };
 
@@ -45,7 +45,7 @@ export async function request() {
 
 async function handler(
   request: Request,
-  Layout: Layout
+  Layout: Layout,
 ): Promise<Response | undefined> {
   const isAction = request.method === "POST";
   let returnValue: unknown | undefined;
@@ -137,7 +137,7 @@ async function rscResponse({
       onError(error: unknown, errorInfo: ErrorInfo) {
         console.error("Error during RSC streaming", error, errorInfo);
       },
-    }
+    },
   );
 
   const url = new URL(request.url);
@@ -194,7 +194,7 @@ export function app(Layout: Layout, options?: AppOptions) {
 }
 
 function isReactActor(
-  maybeComponent: ReactComponent | typeof ReactActor<unknown>
+  maybeComponent: ReactComponent | typeof ReactActor<unknown>,
 ): maybeComponent is typeof ReactActor<unknown> {
   return (
     typeof maybeComponent === "function" &&

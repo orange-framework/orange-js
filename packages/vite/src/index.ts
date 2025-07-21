@@ -18,7 +18,7 @@ export type OrangeRSCPluginOptions = {
 };
 
 export default function orange(
-  options: OrangeRSCPluginOptions = {}
+  options: OrangeRSCPluginOptions = {},
 ): PluginOption[] {
   let _config: Config;
 
@@ -48,11 +48,11 @@ export default function orange(
       entries: {
         client: entrypoint(
           "entry.browser",
-          "node_modules/@orange-js/vite/dist/entrypoints/entry.browser.js"
+          "node_modules/@orange-js/vite/dist/entrypoints/entry.browser.js",
         ),
         ssr: entrypoint(
           "entry.ssr",
-          "node_modules/@orange-js/vite/dist/entrypoints/entry.ssr.js"
+          "node_modules/@orange-js/vite/dist/entrypoints/entry.ssr.js",
         ),
         // rsc: entrypoint(
         //   "entry.rsc",
@@ -68,7 +68,7 @@ export default function orange(
         viteEnvironment: {
           name: "rsc",
         },
-      }
+      },
     ),
     routesPlugin(config),
   ];
@@ -80,7 +80,7 @@ function entrypoint(name: string, fallback: string) {
       process.cwd(),
       "src",
       "entrypoints",
-      `${name}.${extension}`
+      `${name}.${extension}`,
     );
     if (fs.existsSync(entrypoint)) {
       return entrypoint;

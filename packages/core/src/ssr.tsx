@@ -28,7 +28,7 @@ export async function renderHTML(
     nonce?: string;
     debugNojs?: boolean;
     onError?: (error: unknown, errorInfo: ErrorInfo) => void;
-  }
+  },
 ) {
   // duplicate one RSC stream into two.
   // - one for SSR (ReactClient.createFromReadableStream below)
@@ -64,7 +64,7 @@ export async function renderHTML(
     responseStream = responseStream.pipeThrough(
       injectRscStreamToHtml(rscStream2, {
         nonce: options?.nonce,
-      })
+      }),
     );
   }
 

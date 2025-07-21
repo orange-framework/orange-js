@@ -12,31 +12,33 @@ import { provisionBucket } from "./object-storage.js";
 import { provisionKv } from "./kv.js";
 
 export function provisionCommand(client: Cloudflare) {
-  return createCommand("provision")
-    .description("Provision Cloudflare resources for your project")
-    // .option("-d, --durable-objects", "Provision Durable Objects")
-    .option("-k, --kv", "Provision Key-Value Store")
-    .option("-s, --sqlite", "Provision SQLite Database")
-    .option("-D, --d1", "Provision D1 Database")
-    .option("-b, --bucket", "Provision Object Storage Bucket")
-    .option("-R, --r2", "Provision R2 Bucket")
-    .option("-p, --postgres", "Provision Postgres Database")
-    .action(async (options) => {
-      const accountId = await readAccountId(client);
-      const selectedResource = await determineResource(options);
+  return (
+    createCommand("provision")
+      .description("Provision Cloudflare resources for your project")
+      // .option("-d, --durable-objects", "Provision Durable Objects")
+      .option("-k, --kv", "Provision Key-Value Store")
+      .option("-s, --sqlite", "Provision SQLite Database")
+      .option("-D, --d1", "Provision D1 Database")
+      .option("-b, --bucket", "Provision Object Storage Bucket")
+      .option("-R, --r2", "Provision R2 Bucket")
+      .option("-p, --postgres", "Provision Postgres Database")
+      .action(async (options) => {
+        const accountId = await readAccountId(client);
+        const selectedResource = await determineResource(options);
 
-      if (selectedResource === "postgres") {
-        await provisionPostgres(client, accountId);
-      } else if (selectedResource === "sqlite") {
-        await provisionSqlite(client, accountId);
-      } else if (selectedResource === "bucket") {
-        await provisionBucket(client, accountId);
-      } else if (selectedResource === "kv") {
-        await provisionKv(client, accountId);
-      } else if (selectedResource === "durable-objects") {
-        // await provisionDurableObjects();
-      }
-    });
+        if (selectedResource === "postgres") {
+          await provisionPostgres(client, accountId);
+        } else if (selectedResource === "sqlite") {
+          await provisionSqlite(client, accountId);
+        } else if (selectedResource === "bucket") {
+          await provisionBucket(client, accountId);
+        } else if (selectedResource === "kv") {
+          await provisionKv(client, accountId);
+        } else if (selectedResource === "durable-objects") {
+          // await provisionDurableObjects();
+        }
+      })
+  );
 }
 
 async function determineResource(options: {

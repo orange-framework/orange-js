@@ -47,8 +47,8 @@ async function generateRouteTypes(config: ResolvedConfig) {
         import type * as T from "@orange-js/orange/route-module"
 
         type Module = typeof import("${importPrefix}${route.file
-        .replace(".tsx", "")
-        .replace(".jsx", "")}")
+          .replace(".tsx", "")
+          .replace(".jsx", "")}")
 
         export type Info = {
           parents: [],
@@ -82,7 +82,7 @@ async function generateRouteTypes(config: ResolvedConfig) {
       `,
       {
         encoding: "utf-8",
-      }
+      },
     );
   }
 }

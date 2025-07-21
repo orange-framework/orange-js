@@ -6,7 +6,7 @@ import type { Route } from "./index.js";
 export function fsRoutes(): Route[] {
   const routesDir = path.resolve(process.cwd(), "app", "routes");
   const routes = walkDir(routesDir).map((route) =>
-    route.replace(`${routesDir}/`, "")
+    route.replace(`${routesDir}/`, ""),
   );
 
   return routes
