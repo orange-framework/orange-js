@@ -26,6 +26,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Publish actors
+        run: pnpm publish
+        working-directory: packages/actors
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish vite
         run: pnpm publish
         working-directory: packages/vite
