@@ -51,14 +51,14 @@ export function isolation(): Plugin[] {
 }
 
 const inAppDir = (importPath: string) =>
-  path.resolve(importPath).startsWith(path.resolve("./src"));
+  path.resolve(importPath).startsWith(path.resolve("./app"));
 
 const emptyExports = (exports: string[]) => {
   return exports
     .map((e) =>
       e === "default"
         ? "export default undefined;"
-        : `export const ${e} = undefined;`,
+        : `export const ${e} = undefined;`
     )
     .join("\n");
 };

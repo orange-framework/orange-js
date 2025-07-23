@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@orange-js/orange": "workspace:",
+    "@orange-js/actors": "workspace:",
     "@tailwindcss/vite": "^4.0.14",
     "hono": "^4.6.20",
     "react": "^19.1.0",

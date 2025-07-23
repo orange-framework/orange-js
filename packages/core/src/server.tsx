@@ -7,11 +7,14 @@ import type { ReactFormState } from "react-dom/client";
 import type { ErrorInfo } from "react";
 import { router } from "./router.js";
 
-import { ReactComponent, routes } from "virtual:orange/routes";
-import { ReactActor } from "./actor.js";
-import { env } from "cloudflare:workers";
+import { routes } from "virtual:orange/routes";
+import { isActor } from "./actor.js";
 import { CloudflareEnv } from "./index.js";
 import { internalContext } from "./internal-context.js";
+import { env } from "cloudflare:workers";
+
+// @ts-expect-error
+globalThis.rsc = ReactServer;
 
 export interface Context {
   cloudflare: {
@@ -22,7 +25,7 @@ export interface Context {
 
 export type AppOptions = {
   context?: (
-    env: CloudflareEnv,
+    env: CloudflareEnv
   ) => Omit<Context, "cloudflare"> | Promise<Omit<Context, "cloudflare">>;
 };
 
@@ -45,7 +48,7 @@ export async function request() {
 
 async function handler(
   request: Request,
-  Layout: Layout,
+  Layout: Layout
 ): Promise<Response | undefined> {
   const isAction = request.method === "POST";
   let returnValue: unknown | undefined;
@@ -90,11 +93,12 @@ async function handler(
       params: Record<string, string>;
     }) => React.ReactNode | Promise<React.ReactNode>;
 
-    if (isReactActor(maybeComponent)) {
+    if (isActor(maybeComponent)) {
+      // @ts-ignore
       const name = maybeComponent.nameFromRequest(request);
       Component = () => (
         // @ts-ignore
-        <maybeComponent.Component durableObject={env.HomeActor} name={name} />
+        <maybeComponent.Component actor={maybeComponent} name={name} />
       );
     } else {
       Component = maybeComponent;
@@ -137,7 +141,7 @@ async function rscResponse({
       onError(error: unknown, errorInfo: ErrorInfo) {
         console.error("Error during RSC streaming", error, errorInfo);
       },
-    },
+    }
   );
 
   const url = new URL(request.url);
@@ -178,10 +182,29 @@ async function rscResponse({
 
 import.meta.hot?.accept();
 
+const wsPattern = new URLPattern({
+  pathname: "/:actor/:id",
+});
+
 export function app(Layout: Layout, options?: AppOptions) {
   return {
     async fetch(request: Request) {
       try {
+        if (request.headers.get("Upgrade") === "websocket") {
+          const match = wsPattern.exec(request.url);
+          if (!match) {
+            return new Response("Not found", { status: 404 });
+          }
+
+          const { actor, id } = match.pathname.groups;
+          const ns = (env as any)[actor] as DurableObjectNamespace<any>;
+          const stubId = ns.idFromName(id);
+          const stub = ns.get(stubId);
+          await stub.setIdentifier(id);
+          // @ts-ignore
+          return await stub!.fetch(request);
+        }
+
         return (
           (await handler(request, Layout)) ??
           new Response("Not found", { status: 404 })
@@ -191,13 +214,4 @@ export function app(Layout: Layout, options?: AppOptions) {
       }
     },
   };
-}
-
-function isReactActor(
-  maybeComponent: ReactComponent | typeof ReactActor<unknown>,
-): maybeComponent is typeof ReactActor<unknown> {
-  return (
-    typeof maybeComponent === "function" &&
-    Object.getPrototypeOf(maybeComponent) === ReactActor
-  );
 }

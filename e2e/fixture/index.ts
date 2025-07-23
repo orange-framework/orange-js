@@ -2,7 +2,7 @@ import dedent from "dedent";
 import getPort from "get-port";
 import * as path from "node:path";
 import * as fs from "node:fs/promises";
-import { test as base, Page } from "@playwright/test";
+import { test as base, Browser, Page } from "@playwright/test";
 import { spawn } from "node:child_process";
 import { Unstable_Config } from "wrangler";
 import { stripVTControlCharacters } from "node:util";
@@ -209,17 +209,17 @@ test.multi = multitest;
 
 function multitest(
   title: string,
-  fn: (opts: { page: Page; port: number }) => Promise<void>,
+  fn: (opts: { page: Page; port: number; browser: Browser }) => Promise<void>,
   files: Files = {}
 ) {
-  test(`${title} dev`, async ({ page, dev }) => {
+  test(`${title} dev`, async ({ page, dev, browser }) => {
     const { port } = await dev(files);
-    await fn({ page, port });
+    await fn({ page, port, browser });
   });
 
-  test(`${title} worker`, async ({ page, worker }) => {
+  test(`${title} worker`, async ({ page, worker, browser }) => {
     const { port } = await worker(files);
-    await fn({ page, port });
+    await fn({ page, port, browser });
   });
 }
 

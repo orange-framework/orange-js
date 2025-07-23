@@ -15,7 +15,7 @@ export function configPlugin(): Plugin {
               },
             },
             optimizeDeps: {
-              exclude: ["virtual:orange/routes"],
+              exclude: ["virtual:orange/routes", "@orange-js/actors"],
             },
           },
           ssr: {

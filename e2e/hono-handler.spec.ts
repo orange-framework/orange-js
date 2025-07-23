@@ -7,7 +7,7 @@ test.multi(
     await expect(page.getByText("Hello World")).toBeVisible();
   },
   {
-    "app/routes/index.tsx.tsx": `
+    "app/routes/index.tsx": `
       export default async function Index() {
         return <div>Hello World</div>;
       }
@@ -37,7 +37,7 @@ test.multi(
     await expect(page.getByText('{"status":"ok"}')).toBeVisible();
   },
   {
-    "app/routes/index.tsx.tsx": `
+    "app/routes/index.tsx": `
       export default async function Index() {
         return <div>Hello World</div>;
       }
@@ -70,7 +70,7 @@ test.multi(
     await expect(page.getByText('{"version":"1.0.0"}')).toBeVisible();
   },
   {
-    "app/routes/index.tsx.tsx": `
+    "app/routes/index.tsx": `
       export default async function Index() {
         return <div>Hello World</div>;
       }
@@ -112,7 +112,7 @@ test.multi(
     expect(response).toEqual({ echo: "test" });
   },
   {
-    "app/routes/index.tsx.tsx": `
+    "app/routes/index.tsx": `
       export default async function Index() {
         return <div>Hello World</div>;
       }
@@ -145,7 +145,7 @@ test.multi(
     await expect(page.getByText("About Page")).toBeVisible();
   },
   {
-    "app/routes/index.tsx.tsx": `
+    "app/routes/index.tsx": `
       export default async function Index() {
         return <div>Hello World</div>;
       }
