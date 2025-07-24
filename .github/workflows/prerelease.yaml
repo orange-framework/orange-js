@@ -29,31 +29,31 @@ jobs:
         run: node scripts/version-for-prerelease.ts
 
       - name: Publish core
-        run: pnpm publish --no-git-checks --tag dev
+        run: pnpm publish --no-git-checks --tag dev --access public
         working-directory: packages/core
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish actors
-        run: pnpm publish --no-git-checks --tag dev
+        run: pnpm publish --no-git-checks --tag dev --access public
         working-directory: packages/actors
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish vite
-        run: pnpm publish --no-git-checks --tag dev
+        run: pnpm publish --no-git-checks --tag dev --access public
         working-directory: packages/vite
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish create-orange
-        run: pnpm publish --no-git-checks --tag dev
+        run: pnpm publish --no-git-checks --tag dev --access public
         working-directory: packages/create-orange
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish cli
-        run: pnpm publish --no-git-checks --tag dev
+        run: pnpm publish --no-git-checks --tag dev --access public
         working-directory: packages/cli
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
