@@ -13,12 +13,17 @@ type ClassMethodDecorator<Args extends any[], Return> = (
   context: ClassMethodDecoratorContext
 ) => any;
 
+export const observedSymbol = Symbol("orange:observed");
+
 export function Observed(
   ...names: string[]
 ): ClassMethodDecorator<any[], Promise<JSX.Element>> {
   return function (this: Actor<any>, value, context) {
     context.addInitializer(function () {
       const self = this as Actor<any>;
+
+      // @ts-ignore
+      self[observedSymbol] = true;
 
       self["onPersist"] = async () => {
         const ret = await value.apply(this);

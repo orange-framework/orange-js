@@ -2,6 +2,7 @@ import * as React from "react";
 import { ActorState, Actor as CfActor, getActor } from "@cloudflare/actors";
 import { isValidElement } from "react";
 import { ClientComponent } from "./cl.js";
+import { observedSymbol } from "./observed.js";
 
 export * from "@cloudflare/actors";
 
@@ -23,12 +24,14 @@ export abstract class Actor<Env> extends CfActor<Env> {
   async __rscStream(
     name: string,
     props: Record<string, any>
-  ): Promise<ReadableStream> {
+  ): Promise<[ReadableStream, boolean]> {
     const Component = (this[name as keyof this] as any).bind(this);
     const rscStream = rsc().renderToReadableStream<RSCPayload>({
       root: <Component {...props} />,
     });
-    return rscStream;
+    // @ts-ignore
+    const observed = this[observedSymbol] ?? false;
+    return [rscStream, observed];
   }
 
   static Component = Component;
@@ -41,7 +44,7 @@ export abstract class Actor<Env> extends CfActor<Env> {
   }
 }
 
-async function InternalComponent<T extends Actor<Env>, Env>(
+async function internalComponent<T extends Actor<Env>, Env>(
   props: {
     actor: ActorConstructor<T>;
     name?: string;
@@ -73,9 +76,14 @@ async function InternalComponent<T extends Actor<Env>, Env>(
   await new Promise((resolve) => setTimeout(resolve, 25));
 
   const rscStream = await stub.__rscStream("Component", rest);
-  const payload = await rsc().createFromReadableStream<RSCPayload>(rscStream);
+  const payload = await rsc().createFromReadableStream<RSCPayload>(
+    rscStream[0] as ReadableStream
+  );
 
-  return payload.root;
+  return {
+    root: payload.root,
+    isObserved: rscStream[1],
+  };
 }
 
 type PropsFromDurableObject<
@@ -97,19 +105,20 @@ async function Component<T extends Actor<Env>, Env>(
   props: {
     actor: ActorConstructor<T>;
     name?: string;
-    observed?: boolean;
   } & PropsFromDurableObject<T, Env, "Component">
 ) {
-  if (props.observed) {
+  const { root, isObserved } = await internalComponent(props);
+
+  if (isObserved) {
     return (
       <ClientComponent
         actorName={props.actor.name}
         id={props.name ?? "default"}
       >
-        <InternalComponent {...props} />
+        {root}
       </ClientComponent>
     );
   }
 
-  return await InternalComponent(props);
+  return root;
 }

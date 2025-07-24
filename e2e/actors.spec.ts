@@ -175,7 +175,7 @@ test.multi(
     export default function Home() {
       return (
         <div>
-          <Test.Component actor={Test} name="foo" observed />
+          <Test.Component actor={Test} name="foo" />
           <button onClick={increment}>Increment</button>
         </div>
       );
