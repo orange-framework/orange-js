@@ -16,10 +16,12 @@ function rsc() {
 
 type RSCPayload = { root: React.ReactNode };
 
-export abstract class Actor<Env> extends CfActor<Env> {
-  abstract Component(
+export class Actor<Env> extends CfActor<Env> {
+  Component(
     props: Record<string, unknown>
-  ): React.ReactNode | Promise<React.ReactNode>;
+  ): React.ReactNode | Promise<React.ReactNode> {
+    return null;
+  }
 
   async __rscStream(
     name: string,
