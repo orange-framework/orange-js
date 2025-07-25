@@ -125,9 +125,16 @@ export async function runCmd({
   };
 }
 
-export type CreateServer = (files?: Files) => Promise<{ port: number }>;
+export type CreateServer<T = {}> = (
+  files?: Files
+) => Promise<{ port: number } & T>;
 
-const orangeTest = base.extend<{ dev: CreateServer; worker: CreateServer }>({
+const orangeTest = base.extend<{
+  dev: CreateServer<{
+    addFile: (filePath: string, contents: string) => Promise<void>;
+  }>;
+  worker: CreateServer;
+}>({
   dev: async ({}, use, testInfo) => {
     const tasks = new DisposeScope();
 
@@ -148,7 +155,12 @@ const orangeTest = base.extend<{ dev: CreateServer; worker: CreateServer }>({
         testInfo.attach("Vite dev server", { body: devServer.output() })
       );
 
-      return { port };
+      return {
+        port,
+        addFile: async (filePath: string, contents: string) => {
+          fs.writeFile(path.join(fixtureDir, filePath), dedent(contents));
+        },
+      };
     });
 
     // TODO: prettier doesnt support using
@@ -203,9 +215,27 @@ const orangeTest = base.extend<{ dev: CreateServer; worker: CreateServer }>({
 
 export const test = orangeTest as typeof orangeTest & {
   multi: typeof multitest;
+  dev: typeof devtest;
 };
 
 test.multi = multitest;
+test.dev = devtest;
+
+function devtest(
+  title: string,
+  fn: (opts: {
+    page: Page;
+    port: number;
+    addFile: (filePath: string, contents: string) => Promise<void>;
+    browser: Browser;
+  }) => Promise<void>,
+  files: Files = {}
+) {
+  test(`${title} dev`, async ({ page, dev, browser }) => {
+    const { port, addFile } = await dev(files);
+    await fn({ page, port, addFile, browser });
+  });
+}
 
 function multitest(
   title: string,

@@ -14,7 +14,7 @@ export type ResolvedConfig = Required<Config>;
 
 let _configPromise: Promise<ResolvedConfig> | undefined;
 
-const defaultConfig: ResolvedConfig = {
+let defaultConfig: ResolvedConfig = {
   routes: fsRoutes(),
 };
 
@@ -39,4 +39,9 @@ export async function resolveConfig(): Promise<ResolvedConfig> {
     _configPromise = resolveConfigImpl();
   }
   return _configPromise;
+}
+
+export function resetConfig() {
+  defaultConfig = { routes: fsRoutes() };
+  _configPromise = undefined;
 }

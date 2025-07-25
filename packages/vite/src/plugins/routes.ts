@@ -9,6 +9,10 @@ const vmod = new VirtualModule("routes");
 
 let _routes: Route[] | undefined;
 
+export function resetRoutes() {
+  _routes = undefined;
+}
+
 export function routesPlugin(config: () => Config): Plugin {
   return {
     name: "orange:routes",
@@ -22,19 +26,19 @@ export function routesPlugin(config: () => Config): Plugin {
       }
     },
     async load(id) {
-      const routes = _routes ?? config().routes ?? fsRoutes();
-      _routes = routes;
-
       if (id === vmod.id) {
+        const routes = _routes ?? config().routes ?? fsRoutes();
+        _routes = routes;
+
         const ids = Object.fromEntries(
           routes.map((route) => [
             route.pattern,
             `route_${Math.random().toString(36).substring(2, 15)}`,
-          ]),
+          ])
         );
         const imports = routes.map((route) => {
           return `import * as ${ids[route.pattern]} from "${path.resolve(
-            route.file,
+            route.file
           )}";`;
         });
 
@@ -42,7 +46,7 @@ export function routesPlugin(config: () => Config): Plugin {
           (route) =>
             `{ pattern: new URLPattern({ pathname: "${
               route.pattern
-            }" }), module: ${ids[route.pattern]} }`,
+            }" }), module: ${ids[route.pattern]} }`
         );
 
         return {

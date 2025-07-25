@@ -11,6 +11,7 @@ import { routesPlugin } from "./plugins/routes.js";
 import { isolation } from "./plugins/isolation.js";
 import { Config, resolveConfig } from "./config.js";
 import { preserveClassNames } from "./plugins/preserve-class-names.js";
+import { routeReload } from "./plugins/route-reload.js";
 
 export * from "./routing/fs-routes.js";
 
@@ -74,6 +75,9 @@ export default function orange(
       }
     ),
     routesPlugin(config),
+    routeReload((newConfig) => {
+      _config = newConfig;
+    }),
   ];
 }
 
