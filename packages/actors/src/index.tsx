@@ -75,7 +75,7 @@ async function internalComponent<T extends Actor<Env>, Env>(
   const { actor, ...rest } = props;
 
   // TODO: Remove this hack once the data-race in actors is fixed
-  await new Promise((resolve) => setTimeout(resolve, 25));
+  await stub.setIdentifier(props.name ?? "default");
 
   const rscStream = await stub.__rscStream("Component", rest);
   const payload = await rsc().createFromReadableStream<RSCPayload>(
