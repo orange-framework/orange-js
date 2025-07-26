@@ -6,11 +6,12 @@ import type { Route } from "./index.js";
 export function fsRoutes(): Route[] {
   const routesDir = path.resolve(process.cwd(), "app", "routes");
   const routes = walkDir(routesDir).map((route) =>
-    route.replace(`${routesDir}/`, ""),
+    route.replace(`${routesDir}/`, "")
   );
 
   return routes
     .filter((route) => isEcmaLike(route))
+    .filter((route) => !isBrowserFile(route))
     .map((route) => {
       const pattern = fileNameToPattern(route);
 
@@ -53,4 +54,8 @@ function walkDir(dir: string) {
   }
 
   return files;
+}
+
+function isBrowserFile(fileName: string) {
+  return /\.browser\.(tsx?|jsx?)$/.test(fileName);
 }

@@ -48,7 +48,8 @@ export async function request() {
 
 async function handler(
   request: Request,
-  Layout: Layout
+  Layout: Layout,
+  onError: (error: unknown, errorInfo: ErrorInfo) => void
 ): Promise<Response | undefined> {
   const isAction = request.method === "POST";
   let returnValue: unknown | undefined;
@@ -113,6 +114,7 @@ async function handler(
       request,
       returnValue,
       formState,
+      onError,
     });
   });
 }
@@ -122,6 +124,7 @@ type RscResponseOptions = {
   request: Request;
   returnValue?: unknown;
   formState?: ReactFormState;
+  onError: (error: unknown, errorInfo: ErrorInfo) => void;
 };
 
 async function rscResponse({
@@ -129,6 +132,7 @@ async function rscResponse({
   request,
   returnValue,
   formState,
+  onError,
 }: RscResponseOptions) {
   const rscStream = ReactServer.renderToReadableStream<RscPayload>(
     {
@@ -138,9 +142,7 @@ async function rscResponse({
       formState,
     },
     {
-      onError(error: unknown, errorInfo: ErrorInfo) {
-        console.error("Error during RSC streaming", error, errorInfo);
-      },
+      onError,
     }
   );
 
@@ -169,6 +171,7 @@ async function rscResponse({
     debugNojs: url.searchParams.has("__nojs"),
     onError(error: unknown, errorInfo: ErrorInfo) {
       console.error("Error during RSC serialization", error, errorInfo);
+      onError(error, errorInfo);
     },
   });
 
@@ -189,6 +192,9 @@ const wsPattern = new URLPattern({
 export function app(Layout: Layout, options?: AppOptions) {
   return {
     async fetch(request: Request) {
+      let reactError: unknown | undefined;
+      let reactErrorInfo: ErrorInfo | undefined;
+
       try {
         if (request.headers.get("Upgrade") === "websocket") {
           const match = wsPattern.exec(request.url);
@@ -206,11 +212,36 @@ export function app(Layout: Layout, options?: AppOptions) {
         }
 
         return (
-          (await handler(request, Layout)) ??
-          new Response("Not found", { status: 404 })
+          (await handler(request, Layout, (err, errorInfo) => {
+            reactError = err;
+            reactErrorInfo = errorInfo;
+          })) ?? new Response("Not found", { status: 404 })
         );
       } catch (error) {
-        return new Response("Error", { status: 500 });
+        const err = reactError ?? error;
+
+        const { renderErrorBoundaryResponse } =
+          await import.meta.viteRsc.loadModule<typeof import("./ssr.js")>(
+            "ssr",
+            "index"
+          );
+
+        const stream = await renderErrorBoundaryResponse(
+          err instanceof Error
+            ? {
+                message: err.message,
+                stack: err.stack,
+              }
+            : {
+                message: String(err),
+              }
+        );
+        return new Response(stream, {
+          headers: {
+            "Content-type": "text/html",
+            vary: "accept",
+          },
+        });
       }
     },
   };

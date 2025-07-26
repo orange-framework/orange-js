@@ -239,17 +239,22 @@ function devtest(
 
 function multitest(
   title: string,
-  fn: (opts: { page: Page; port: number; browser: Browser }) => Promise<void>,
+  fn: (opts: {
+    page: Page;
+    port: number;
+    browser: Browser;
+    isDev: boolean;
+  }) => Promise<void>,
   files: Files = {}
 ) {
   test(`${title} dev`, async ({ page, dev, browser }) => {
     const { port } = await dev(files);
-    await fn({ page, port, browser });
+    await fn({ page, port, browser, isDev: true });
   });
 
   test(`${title} worker`, async ({ page, worker, browser }) => {
     const { port } = await worker(files);
-    await fn({ page, port, browser });
+    await fn({ page, port, browser, isDev: false });
   });
 }
 

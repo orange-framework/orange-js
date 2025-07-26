@@ -7,19 +7,11 @@ import type { ReactFormState } from "react-dom/client";
 import * as ReactClient from "@vitejs/plugin-rsc/ssr";
 import * as ReactDOMServer from "react-dom/server.edge";
 import type { RscPayload } from "./server.js";
+import { ErrorFallback } from "./error-handling/browser.js";
+
+export * from "./error-handling/browser.js";
 
 export type RenderHTML = typeof renderHTML;
-
-export class SSRError extends Error {
-  errorInfo: ErrorInfo;
-
-  constructor(message: string, errorInfo: ErrorInfo, cause?: unknown) {
-    super(message);
-    this.name = "SSRError";
-    this.errorInfo = errorInfo;
-    this.cause = cause;
-  }
-}
 
 export async function renderHTML(
   rscStream: ReadableStream<Uint8Array>,
@@ -28,7 +20,7 @@ export async function renderHTML(
     nonce?: string;
     debugNojs?: boolean;
     onError?: (error: unknown, errorInfo: ErrorInfo) => void;
-  },
+  }
 ) {
   // duplicate one RSC stream into two.
   // - one for SSR (ReactClient.createFromReadableStream below)
@@ -64,9 +56,32 @@ export async function renderHTML(
     responseStream = responseStream.pipeThrough(
       injectRscStreamToHtml(rscStream2, {
         nonce: options?.nonce,
-      }),
+      })
     );
   }
 
   return responseStream;
+}
+
+export async function renderErrorBoundaryResponse(opts: {
+  message: string;
+  stack?: string;
+}) {
+  let error: Error | null = null;
+
+  if (process.env.NODE_ENV === "development") {
+    if (opts.stack) {
+      error = new Error(opts.message, {
+        // @ts-ignore
+        stack: opts.stack,
+      });
+    } else {
+      error = new Error(opts.message);
+    }
+  }
+
+  return await ReactDOMServer.renderToReadableStream(
+    <ErrorFallback error={error} />,
+    {}
+  );
 }

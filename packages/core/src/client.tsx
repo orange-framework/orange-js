@@ -6,6 +6,7 @@ import * as ReactClient from "@vitejs/plugin-rsc/browser";
 import { getRscStreamFromHtml } from "@vitejs/plugin-rsc/rsc-html-stream/browser";
 import * as ReactDOMClient from "react-dom/client";
 import type { RscPayload } from "./server.js";
+import { ErrorBoundary, ErrorFallback } from "./error-handling/browser.js";
 
 // @ts-expect-error
 globalThis.rsc = ReactClient;
@@ -67,7 +68,9 @@ export async function main() {
   // hydration
   const browserRoot = (
     <React.StrictMode>
-      <BrowserRoot />
+      <ErrorBoundary fallback={(props) => <ErrorFallback {...props} />}>
+        <BrowserRoot />
+      </ErrorBoundary>
     </React.StrictMode>
   );
   ReactDOMClient.hydrateRoot(document, browserRoot, {
