@@ -70,7 +70,7 @@ export async function provisionSqlite(client: Cloudflare, accountId: string) {
       start: "Creating database...",
       success: () => "Database created",
       error: "Failed to create database",
-    },
+    }
   );
 
   const extraDbConfig = isDrizzleInstalled()
@@ -91,7 +91,7 @@ export async function provisionSqlite(client: Cloudflare, accountId: string) {
         },
       ],
     },
-    true,
+    true
   );
 
   await loader(generateWranglerTypes(), {
@@ -107,31 +107,35 @@ export async function provisionSqlite(client: Cloudflare, accountId: string) {
         'import { drizzle } from "drizzle-orm/d1";',
         'import * as schema from "./schema.server";',
       ],
-      `drizzle(env.${camelCase(sqliteName)}, { schema })`,
+      `drizzle(env.${camelCase(sqliteName)}, { schema })`
     );
 
     writeFileSync(join(process.cwd(), "app/database.server.ts"), databaseFile);
 
     log(
       c.dim("You'll need to create a schema file in your app directory."),
-      c.dim("See more at https://orm.drizzle.team/docs/sql-schema-declaration"),
+      c.dim("See more at https://orm.drizzle.team/docs/sql-schema-declaration")
     );
 
     step(
-      `Created  SQLite database accessible via \`${c.dim(`context.${camelCase(sqliteName)}`)}\``,
+      `Created  SQLite database accessible via \`${c.dim(
+        `context.${camelCase(sqliteName)}`
+      )}\``
     );
 
     warn(
       dedent`
-      Add \`${orange("database")}\` from \`${orange("app/database.context.ts")}\` to your entrypoint defined in \`${orange("app/entry.server.ts")}\`
+      Add \`${orange("database")}\` from \`${orange(
+        "app/database.context.ts"
+      )}\` to your entrypoint defined in \`${orange("app/entry.server.tsx")}\`
       See more at ${orange("https://orange-js.dev/docs/context")}
-      `.trim(),
+      `.trim()
     );
   } else {
     step(
       `Created SQLite database accessible via \`${c.dim(
-        `env.${camelCase(sqliteName)}`,
-      )}\``,
+        `env.${camelCase(sqliteName)}`
+      )}\``
     );
   }
 }
@@ -146,7 +150,7 @@ async function existingDatabaseNames(client: Cloudflare, accountId: string) {
   names.push(
     ...existingDatabases.result
       .map((db) => db.name?.toLowerCase())
-      .filter((name) => name !== undefined),
+      .filter((name) => name !== undefined)
   );
 
   while (existingDatabases.result.length === 100) {
@@ -159,7 +163,7 @@ async function existingDatabaseNames(client: Cloudflare, accountId: string) {
     names.push(
       ...existingDatabases.result
         .map((db) => db.name?.toLowerCase())
-        .filter((name) => name !== undefined),
+        .filter((name) => name !== undefined)
     );
   }
 
@@ -169,7 +173,7 @@ async function existingDatabaseNames(client: Cloudflare, accountId: string) {
 function databaseFileTemplate(
   databaseName: string,
   imports: string | string[],
-  databaseExpr: string,
+  databaseExpr: string
 ) {
   return dedent`
   import { env } from "cloudflare:workers";

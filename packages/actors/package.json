@@ -1,0 +1,33 @@
+{
+  "name": "@orange-js/actors",
+  "version": "0.3.0",
+  "description": "",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc -w"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@vitejs/plugin-rsc": "^0.4.12",
+    "react": "^19.1.0",
+    "typescript": "^5.7.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "peerDependencies": {
+    "@cloudflare/actors": "0.0.1-beta.1",
+    "@vitejs/plugin-rsc": "^0.4.12",
+    "react": "^19.1.0"
+  }
+}

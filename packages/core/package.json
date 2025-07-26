@@ -1,6 +1,6 @@
 {
   "name": "@orange-js/orange",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "",
   "keywords": [],
   "author": "zeb@zebulon.dev",
@@ -21,39 +21,35 @@
       "import": "./dist/client.js",
       "types": "./dist/client.d.ts"
     },
+    "./ssr": {
+      "import": "./dist/ssr.js",
+      "types": "./dist/ssr.d.ts"
+    },
     "./server": {
       "import": "./dist/server.js",
       "types": "./dist/server.d.ts"
     },
-    "./server-entry": {
-      "import": "./dist/server-entry.js",
-      "types": "./dist/server-entry.d.ts"
-    },
     "./modules": {
       "types": "./src/modules.d.ts"
-    },
-    "./workflows": {
-      "import": "./dist/workflows.js",
-      "types": "./dist/workflows.d.ts"
-    },
-    "./route-module": {
-      "import": "./dist/route-module.js",
-      "types": "./dist/route-module.d.ts"
     },
     "./hono": {
       "import": "./dist/hono.js",
       "types": "./dist/hono.d.ts"
     }
   },
+  "optionalDependencies": {
+    "@cloudflare/actors": "0.0.1-beta.1"
+  },
   "peerDependencies": {
     "react": ">=19",
     "react-dom": ">=19"
   },
   "devDependencies": {
+    "@cloudflare/actors": "0.0.1-beta.1",
     "@cloudflare/workers-types": "^4.20250413.0",
     "@types/node": "^22.13.0",
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "typescript": "^5.7.2"
   },
   "files": [
@@ -62,7 +58,6 @@
     "LICENSE"
   ],
   "dependencies": {
-    "hono": "^4.6.20",
-    "react-router": "=7.6.0"
+    "hono": "^4.6.20"
   }
 }

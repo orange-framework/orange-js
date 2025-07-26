@@ -18,11 +18,17 @@ jobs:
           node-version: "23.x"
           registry-url: "https://registry.npmjs.org"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -r build
+      - run: pnpm recursive run --sort --workspace-concurrency=1 build
 
       - name: Publish core
         run: pnpm publish
         working-directory: packages/core
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish actors
+        run: pnpm publish
+        working-directory: packages/actors
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

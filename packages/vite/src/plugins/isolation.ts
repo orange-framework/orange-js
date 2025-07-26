@@ -58,7 +58,7 @@ const emptyExports = (exports: string[]) => {
     .map((e) =>
       e === "default"
         ? "export default undefined;"
-        : `export const ${e} = undefined;`,
+        : `export const ${e} = undefined;`
     )
     .join("\n");
 };

@@ -18,19 +18,21 @@
     "@cloudflare/workers-types": "^4.20250224.0",
     "@orange-js/cli": "workspace:*",
     "@orange-js/vite": "workspace:*",
-    "@types/react": "^19.0.2",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "esbuild": "^0.24.2",
     "typescript": "^5.8.2",
-    "vite": "^7.0.2",
+    "vite": "^7.0.5",
     "vite-tsconfig-paths": "^5.1.4",
     "wrangler": "^4.23.0"
   },
   "dependencies": {
     "@orange-js/orange": "workspace:",
+    "@orange-js/actors": "workspace:",
     "@tailwindcss/vite": "^4.0.14",
     "hono": "^4.6.20",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "tailwindcss": "^4.0.14"
   }
 }

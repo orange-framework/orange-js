@@ -2,7 +2,7 @@ import dedent from "dedent";
 import getPort from "get-port";
 import * as path from "node:path";
 import * as fs from "node:fs/promises";
-import { test as base, Page } from "@playwright/test";
+import { test as base, Browser, Page } from "@playwright/test";
 import { spawn } from "node:child_process";
 import { Unstable_Config } from "wrangler";
 import { stripVTControlCharacters } from "node:util";
@@ -125,9 +125,16 @@ export async function runCmd({
   };
 }
 
-export type CreateServer = (files?: Files) => Promise<{ port: number }>;
+export type CreateServer<T = {}> = (
+  files?: Files
+) => Promise<{ port: number } & T>;
 
-const orangeTest = base.extend<{ dev: CreateServer; worker: CreateServer }>({
+const orangeTest = base.extend<{
+  dev: CreateServer<{
+    addFile: (filePath: string, contents: string) => Promise<void>;
+  }>;
+  worker: CreateServer;
+}>({
   dev: async ({}, use, testInfo) => {
     const tasks = new DisposeScope();
 
@@ -148,7 +155,12 @@ const orangeTest = base.extend<{ dev: CreateServer; worker: CreateServer }>({
         testInfo.attach("Vite dev server", { body: devServer.output() })
       );
 
-      return { port };
+      return {
+        port,
+        addFile: async (filePath: string, contents: string) => {
+          fs.writeFile(path.join(fixtureDir, filePath), dedent(contents));
+        },
+      };
     });
 
     // TODO: prettier doesnt support using
@@ -203,23 +215,46 @@ const orangeTest = base.extend<{ dev: CreateServer; worker: CreateServer }>({
 
 export const test = orangeTest as typeof orangeTest & {
   multi: typeof multitest;
+  dev: typeof devtest;
 };
 
 test.multi = multitest;
+test.dev = devtest;
+
+function devtest(
+  title: string,
+  fn: (opts: {
+    page: Page;
+    port: number;
+    addFile: (filePath: string, contents: string) => Promise<void>;
+    browser: Browser;
+  }) => Promise<void>,
+  files: Files = {}
+) {
+  test(`${title} dev`, async ({ page, dev, browser }) => {
+    const { port, addFile } = await dev(files);
+    await fn({ page, port, addFile, browser });
+  });
+}
 
 function multitest(
   title: string,
-  fn: (opts: { page: Page; port: number }) => Promise<void>,
+  fn: (opts: {
+    page: Page;
+    port: number;
+    browser: Browser;
+    isDev: boolean;
+  }) => Promise<void>,
   files: Files = {}
 ) {
-  test(`${title} dev`, async ({ page, dev }) => {
+  test(`${title} dev`, async ({ page, dev, browser }) => {
     const { port } = await dev(files);
-    await fn({ page, port });
+    await fn({ page, port, browser, isDev: true });
   });
 
-  test(`${title} worker`, async ({ page, worker }) => {
+  test(`${title} worker`, async ({ page, worker, browser }) => {
     const { port } = await worker(files);
-    await fn({ page, port });
+    await fn({ page, port, browser, isDev: false });
   });
 }
 
@@ -227,7 +262,7 @@ export * from "@playwright/test";
 
 const baseConfig = {
   name: "basic",
-  main: "./app/entry.server.ts",
+  main: "./app/entry.server.tsx",
   compatibility_date: "2025-05-11",
   compatibility_flags: ["nodejs_compat"],
   assets: {

@@ -1,3 +1,4 @@
+// @ts-nocheck - TODO(zebp): re-enable this once RSC is more mature
 import * as fs from "node:fs/promises";
 import { flatRoutes } from "@react-router/fs-routes";
 import { loadRoutes } from "@orange-js/vite/routes";
@@ -43,7 +44,7 @@ function durableObjectInCode(contents: string): string | undefined {
 }
 
 export async function provisionDurableObjects() {
-  const config = await resolveConfig()
+  const config = await resolveConfig();
 
   const wranglerConfig = readWranglerConfig({});
   const durableObjects = await findDurableObjects(config);
@@ -85,12 +86,9 @@ export async function provisionDurableObjects() {
     ],
   });
 
-  await loader(
-    generateWranglerTypes(),
-    {
-      start: "Generating Wrangler types...",
-      success: () => "Wrangler types generated",
-      error: "Failed to generate Wrangler types",
-    },
-  );
+  await loader(generateWranglerTypes(), {
+    start: "Generating Wrangler types...",
+    success: () => "Wrangler types generated",
+    error: "Failed to generate Wrangler types",
+  });
 }

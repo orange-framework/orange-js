@@ -27,7 +27,7 @@ export async function promptForAccount(client: Cloudflare): Promise<string> {
   writeFileSync(
     "node_modules/.cache/orange/orange-account.json",
     JSON.stringify({ accountId: account }, null, 2),
-    "utf8"
+    "utf8",
   );
 
   return account;

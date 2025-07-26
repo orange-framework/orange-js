@@ -22,32 +22,38 @@ jobs:
           node-version: "23.x"
           registry-url: "https://registry.npmjs.org"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -r build
+      - run: pnpm recursive run --sort --workspace-concurrency=1 build
       - name: Write dev versions
         env:
           PR_SHA: ${{ github.event.pull_request.head.sha }}
         run: node scripts/version-for-prerelease.ts
 
       - name: Publish core
-        run: pnpm publish --no-git-checks --tag dev
+        run: pnpm publish --no-git-checks --tag dev --access public
         working-directory: packages/core
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Publish actors
+        run: pnpm publish --no-git-checks --tag dev --access public
+        working-directory: packages/actors
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish vite
-        run: pnpm publish --no-git-checks --tag dev
+        run: pnpm publish --no-git-checks --tag dev --access public
         working-directory: packages/vite
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish create-orange
-        run: pnpm publish --no-git-checks --tag dev
+        run: pnpm publish --no-git-checks --tag dev --access public
         working-directory: packages/create-orange
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish cli
-        run: pnpm publish --no-git-checks --tag dev
+        run: pnpm publish --no-git-checks --tag dev --access public
         working-directory: packages/cli
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -63,10 +69,10 @@ jobs:
 
             Install the prerelease packages with:
             \`\`\`bash
-            npm install @orange-js/orange@0.0.0-${sha} && npm install -D @orange-js/vite@0.0.0-${sha} && npm install -D @orange-js/cli@0.0.0-${sha}
-            pnpm add @orange-js/orange@0.0.0-${sha} && pnpm add -D @orange-js/vite@0.0.0-${sha} && pnpm add -D @orange-js/cli@0.0.0-${sha}
-            yarn add @orange-js/orange@0.0.0-${sha} && yarn add -D @orange-js/vite@0.0.0-${sha} && yarn add -D @orange-js/cli@0.0.0-${sha}
-            bun add @orange-js/orange@0.0.0-${sha} && bun add -D @orange-js/vite@0.0.0-${sha} && bun add -D @orange-js/cli@0.0.0-${sha}
+            npm install @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} && npm install -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
+            pnpm add @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} && pnpm add -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
+            yarn add @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} && yarn add -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
+            bun add @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} && bun add -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
             \`\`\``;
 
             github.rest.issues.createComment({
