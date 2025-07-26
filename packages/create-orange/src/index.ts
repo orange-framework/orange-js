@@ -20,13 +20,23 @@ async function main() {
     validate: (value) => value.length > 0,
   });
 
+  const branch = process.argv[3] ?? "main";
+
   await command(
     {
       message: "Cloning template...",
       bin: "git",
-      args: ["clone", "https://github.com/zebp/orange-template.git", name],
+      args: [
+        "clone",
+        "https://github.com/zebp/orange-template.git",
+        name,
+        "--depth",
+        "1",
+        "--branch",
+        branch,
+      ],
     },
-    { clearPromptOnDone: true },
+    { clearPromptOnDone: true }
   );
 
   const replacements = {
@@ -36,6 +46,7 @@ async function main() {
   rmSync(`${name}/.git`, { recursive: true, force: true });
   replace(`${name}/package.json`, replacements);
   replace(`${name}/wrangler.jsonc`, replacements);
+  replace(`${name}/README.md`, replacements);
 
   const doInstallDeps = await confirm({
     message: "Do you want to install dependencies?",
@@ -50,7 +61,7 @@ async function main() {
         args: ["install"],
         cwd: name,
       },
-      { clearPromptOnDone: true },
+      { clearPromptOnDone: true }
     );
   }
 
@@ -64,7 +75,7 @@ async function main() {
         args: ["init"],
         cwd: name,
       },
-      { clearPromptOnDone: true },
+      { clearPromptOnDone: true }
     );
 
     execSync("git add .", { cwd: name });
@@ -76,7 +87,7 @@ async function main() {
         args: ["commit", "-m", "Initial commit"],
         cwd: name,
       },
-      { clearPromptOnDone: true },
+      { clearPromptOnDone: true }
     );
   }
 
