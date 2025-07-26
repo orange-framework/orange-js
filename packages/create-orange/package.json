@@ -1,6 +1,6 @@
 {
   "name": "create-orange",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "",
   "bin": "./dist/index.js",
   "main": "dist/index.js",
@@ -10,8 +10,8 @@
     "build:watch": "tsc -w"
   },
   "exports": {
-		".": "./dist/index.js"
-	},
+    ".": "./dist/index.js"
+  },
   "keywords": [],
   "author": "zeb@zebulon.dev",
   "license": "MIT",
