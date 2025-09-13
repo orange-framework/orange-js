@@ -1,7 +1,6 @@
 import * as React from "react";
 import { ActorState, Actor as CfActor, getActor } from "@cloudflare/actors";
 import { isValidElement } from "react";
-import { ClientComponent } from "./cl.js";
 import { observedSymbol } from "./observed.js";
 
 export * from "@cloudflare/actors";
@@ -110,6 +109,20 @@ async function Component<T extends Actor<Env>, Env>(
   } & PropsFromDurableObject<T, Env, "Component">
 ) {
   const { root, isObserved } = await internalComponent(props);
+
+  let ClientComponent: React.ComponentType<any>;
+
+  // With Vite's pre-bundling in dev mode esbuild will bundle this dependency into
+  // a single ES module, but since we need the client module to be "use client" we
+  // need to ensure that it isn't bundled into a single module.
+  if (process.env.NODE_ENV === "development") {
+    // We need to ensure TS doesn't actually resolve this import to prevent it
+    // from refusing to emit this file.
+    ClientComponent = (await import("@orange-js" + "/actors/client"))
+      .ClientComponent;
+  } else {
+    ClientComponent = (await import("./client.js")).ClientComponent;
+  }
 
   if (isObserved) {
     return (
