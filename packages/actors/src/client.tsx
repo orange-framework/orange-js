@@ -7,9 +7,6 @@ function rsc() {
   return globalThis.rsc as typeof import("@vitejs/plugin-rsc/rsc");
 }
 
-// @ts-ignore
-globalThis._dawgdhaigdauwgd = "use client";
-
 type ClientComponentProps = {
   children: React.ReactNode;
   actorName: string;

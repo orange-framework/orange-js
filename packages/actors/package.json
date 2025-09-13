@@ -9,6 +9,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client.js",
+      "types": "./dist/client.d.ts"
     }
   },
   "scripts": {
@@ -17,8 +21,8 @@
   },
   "devDependencies": {
     "@types/react": "^19.1.8",
-    "@vitejs/plugin-rsc": "^0.4.12",
-    "react": "^19.1.0",
+    "@vitejs/plugin-rsc": "^0.4.31",
+    "react": "^19.1.1",
     "typescript": "^5.7.2"
   },
   "keywords": [],
@@ -27,7 +31,7 @@
   "packageManager": "pnpm@10.13.1",
   "peerDependencies": {
     "@cloudflare/actors": "0.0.1-beta.1",
-    "@vitejs/plugin-rsc": "^0.4.12",
-    "react": "^19.1.0"
+    "@vitejs/plugin-rsc": "^0.4.31",
+    "react": "^19.1.1"
   }
 }
