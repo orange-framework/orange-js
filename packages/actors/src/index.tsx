@@ -2,16 +2,14 @@ import * as React from "react";
 import { ActorState, Actor as CfActor, getActor } from "@cloudflare/actors";
 import { isValidElement } from "react";
 import { observedSymbol } from "./observed.js";
+import {
+  createFromReadableStream,
+  renderToReadableStream,
+} from "@vitejs/plugin-rsc/rsc";
 
 export * from "@cloudflare/actors";
 
 export * from "./observed.js";
-
-// TODO: remove this hack once dependency de-dupe works
-function rsc() {
-  // @ts-ignore
-  return globalThis.rsc as typeof import("@vitejs/plugin-rsc/rsc");
-}
 
 type RSCPayload = { root: React.ReactNode };
 
@@ -27,7 +25,7 @@ export class Actor<Env> extends CfActor<Env> {
     props: Record<string, any>
   ): Promise<[ReadableStream, boolean]> {
     const Component = (this[name as keyof this] as any).bind(this);
-    const rscStream = rsc().renderToReadableStream<RSCPayload>({
+    const rscStream = renderToReadableStream<RSCPayload>({
       root: <Component {...props} />,
     });
     // @ts-ignore
@@ -77,7 +75,7 @@ async function internalComponent<T extends Actor<Env>, Env>(
   await stub.setIdentifier(props.name ?? "default");
 
   const rscStream = await stub.__rscStream("Component", rest);
-  const payload = await rsc().createFromReadableStream<RSCPayload>(
+  const payload = await createFromReadableStream<RSCPayload>(
     rscStream[0] as ReadableStream
   );
 

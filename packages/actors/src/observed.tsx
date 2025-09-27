@@ -1,12 +1,6 @@
-import * as React from "react";
 import { Actor } from "./index.js";
 import { type JSX } from "react";
-
-// TODO: remove this hack once dependency de-dupe works
-function rsc() {
-  // @ts-ignore
-  return globalThis.rsc as typeof import("@vitejs/plugin-rsc/rsc");
-}
+import { renderToReadableStream } from "@vitejs/plugin-rsc/rsc";
 
 type ClassMethodDecorator<Args extends any[], Return> = (
   value: (...args: Args) => Return,
@@ -27,7 +21,7 @@ export function Observed(
 
       self["onPersist"] = async () => {
         const ret = await value.apply(this);
-        const stream = rsc().renderToReadableStream({
+        const stream = renderToReadableStream({
           root: ret,
         });
 

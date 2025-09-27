@@ -8,9 +8,6 @@ import * as ReactDOMClient from "react-dom/client";
 import type { RscPayload } from "./server.js";
 import { ErrorBoundary, ErrorFallback } from "./error-handling/browser.js";
 
-// @ts-expect-error
-globalThis.rsc = ReactClient;
-
 export async function main() {
   // stash `setPayload` function to trigger re-rendering
   // from outside of `BrowserRoot` component (e.g. server function call, navigation, hmr)
