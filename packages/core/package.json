@@ -35,6 +35,10 @@
     "./hono": {
       "import": "./dist/hono.js",
       "types": "./dist/hono.d.ts"
+    },
+    "./rsc": {
+      "import": "./dist/rsc.js",
+      "types": "./dist/rsc.d.ts"
     }
   },
   "optionalDependencies": {

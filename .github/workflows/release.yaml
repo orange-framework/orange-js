@@ -32,6 +32,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Publish web-fragments
+        run: pnpm publish
+        working-directory: packages/web-fragments
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish vite
         run: pnpm publish
         working-directory: packages/vite
