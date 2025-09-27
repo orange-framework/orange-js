@@ -13,9 +13,6 @@ import { CloudflareEnv } from "./index.js";
 import { internalContext } from "./internal-context.js";
 import { env } from "cloudflare:workers";
 
-// @ts-expect-error
-globalThis.rsc = ReactServer;
-
 export interface Context {
   cloudflare: {
     env: CloudflareEnv;

@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 
-// TODO: remove this hack once dependency de-dupe works
-function rsc() {
-  // @ts-ignore
-  return globalThis.rsc as typeof import("@vitejs/plugin-rsc/rsc");
-}
+const createFromReadableStream = import.meta.env.SSR
+  ? () => {
+      throw new Error("createFromReadableStream is not available in SSR");
+    }
+  : await import("@vitejs/plugin-rsc/browser").then(
+      (m) => m.createFromReadableStream
+    );
 
 type ClientComponentProps = {
   children: React.ReactNode;
@@ -20,27 +22,29 @@ export function ClientComponent({
 }: ClientComponentProps) {
   const [component, setComponent] = useState<React.ReactNode | null>(null);
 
-  useEffect(() => {
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const ws = new WebSocket(
-      `${protocol}//${window.location.host}/${actorName}/${id}`
-    );
+  if (!import.meta.env.SSR) {
+    useEffect(() => {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const ws = new WebSocket(
+        `${protocol}//${window.location.host}/${actorName}/${id}`
+      );
 
-    ws.addEventListener("message", async (event) => {
-      const data = event.data as Blob;
-      const bytes = await data.arrayBuffer();
-      const stream = new ReadableStream({
-        start(controller) {
-          controller.enqueue(new Uint8Array(bytes));
-          controller.close();
-        },
+      ws.addEventListener("message", async (event) => {
+        const data = event.data as Blob;
+        const bytes = await data.arrayBuffer();
+        const stream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(new Uint8Array(bytes));
+            controller.close();
+          },
+        });
+        const created = await createFromReadableStream(stream);
+        setComponent((created as any).root);
       });
-      const created = await rsc().createFromReadableStream(stream);
-      setComponent((created as any).root);
-    });
 
-    return () => ws.close();
-  }, []);
+      return () => ws.close();
+    }, []);
+  }
 
   if (!component) {
     return children;
