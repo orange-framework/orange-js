@@ -3,7 +3,7 @@
 
 import React from "react";
 import * as ReactClient from "@vitejs/plugin-rsc/browser";
-import { getRscStreamFromHtml } from "@vitejs/plugin-rsc/rsc-html-stream/browser";
+import { rscStream } from "rsc-html-stream/client";
 import * as ReactDOMClient from "react-dom/client";
 import type { RscPayload } from "./server.js";
 import { ErrorBoundary, ErrorFallback } from "./error-handling/browser.js";
@@ -16,7 +16,7 @@ export async function main() {
   // deserialize RSC stream back to React VDOM for CSR
   const initialPayload = await ReactClient.createFromReadableStream<RscPayload>(
     // initial RSC stream is injected in SSR stream as <script>...FLIGHT_DATA...</script>
-    getRscStreamFromHtml()
+    rscStream,
   );
 
   // browser root component to (re-)render RSC payload as state
@@ -38,7 +38,7 @@ export async function main() {
   // re-fetch RSC and trigger re-rendering
   async function fetchRscPayload() {
     const payload = await ReactClient.createFromFetch<RscPayload>(
-      fetch(window.location.href)
+      fetch(window.location.href),
     );
     setPayload(payload);
   }
@@ -56,7 +56,7 @@ export async function main() {
           "x-rsc-action": id,
         },
       }),
-      { temporaryReferences }
+      { temporaryReferences },
     );
     setPayload(payload);
     return payload.returnValue;

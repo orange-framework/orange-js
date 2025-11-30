@@ -4,7 +4,7 @@ import { renderToReadableStream } from "@vitejs/plugin-rsc/rsc";
 
 type ClassMethodDecorator<Args extends any[], Return> = (
   value: (...args: Args) => Return,
-  context: ClassMethodDecoratorContext
+  context: ClassMethodDecoratorContext,
 ) => any;
 
 export const observedSymbol = Symbol("orange:observed");

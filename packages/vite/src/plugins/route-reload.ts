@@ -9,7 +9,7 @@ let reloadCount = 0;
 async function forceReload(
   server: ViteDevServer,
   reloadId: number,
-  updateConfig: (newConfig: ResolvedConfig) => void
+  updateConfig: (newConfig: ResolvedConfig) => void,
 ) {
   if (reloadId !== reloadCount) {
     return;
@@ -25,11 +25,11 @@ async function forceReload(
 }
 
 const pathsToWatch = ["orange.config.ts", "orange.config.js", "app/routes"].map(
-  (file) => path.resolve(file)
+  (file) => path.resolve(file),
 );
 
 export function routeReload(
-  updateConfig: (newConfig: ResolvedConfig) => void
+  updateConfig: (newConfig: ResolvedConfig) => void,
 ): Plugin {
   return {
     name: "orange:reload-routes",

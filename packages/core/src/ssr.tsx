@@ -2,7 +2,7 @@
 // https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-rsc/examples/starter-cf-single/src/framework/entry.ssr.tsx
 
 import React, { ErrorInfo } from "react";
-import { injectRscStreamToHtml } from "@vitejs/plugin-rsc/rsc-html-stream/ssr";
+import { injectRSCPayload } from "rsc-html-stream/server";
 import type { ReactFormState } from "react-dom/client";
 import * as ReactClient from "@vitejs/plugin-rsc/ssr";
 import * as ReactDOMServer from "react-dom/server.edge";
@@ -20,7 +20,7 @@ export async function renderHTML(
     nonce?: string;
     debugNojs?: boolean;
     onError?: (error: unknown, errorInfo: ErrorInfo) => void;
-  }
+  },
 ) {
   // duplicate one RSC stream into two.
   // - one for SSR (ReactClient.createFromReadableStream below)
@@ -54,9 +54,9 @@ export async function renderHTML(
   if (!options?.debugNojs) {
     // initial RSC stream is injected in HTML stream as <script>...FLIGHT_DATA...</script>
     responseStream = responseStream.pipeThrough(
-      injectRscStreamToHtml(rscStream2, {
+      injectRSCPayload(rscStream2, {
         nonce: options?.nonce,
-      })
+      }),
     );
   }
 
@@ -82,6 +82,6 @@ export async function renderErrorBoundaryResponse(opts: {
 
   return await ReactDOMServer.renderToReadableStream(
     <ErrorFallback error={error} />,
-    {}
+    {},
   );
 }

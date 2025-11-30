@@ -24,7 +24,7 @@
     "dedent": "^1.5.3",
     "typescript": "^5.7.2",
     "vite": "6.2",
-    "wrangler": "^4.7.2"
+    "wrangler": "^4.50.0"
   },
   "files": [
     "dist",

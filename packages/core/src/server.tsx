@@ -22,7 +22,7 @@ export interface Context {
 
 export type AppOptions = {
   context?: (
-    env: CloudflareEnv
+    env: CloudflareEnv,
   ) => Omit<Context, "cloudflare"> | Promise<Omit<Context, "cloudflare">>;
 };
 
@@ -46,7 +46,7 @@ export async function request() {
 async function handler(
   request: Request,
   Layout: Layout,
-  onError: (error: unknown, errorInfo: ErrorInfo) => void
+  onError: (error: unknown, errorInfo: ErrorInfo) => void,
 ): Promise<Response | undefined> {
   const isAction = request.method === "POST";
   let returnValue: unknown | undefined;
@@ -72,6 +72,7 @@ async function handler(
       const formData = await request.formData();
       const decodedAction = await ReactServer.decodeAction(formData);
       const result = await decodedAction();
+      // @ts-ignore
       formState = await ReactServer.decodeFormState(result, formData);
     }
   }
@@ -140,7 +141,7 @@ async function rscResponse({
     },
     {
       onError,
-    }
+    },
   );
 
   const url = new URL(request.url);
@@ -220,7 +221,7 @@ export function app(Layout: Layout, options?: AppOptions) {
         const { renderErrorBoundaryResponse } =
           await import.meta.viteRsc.loadModule<typeof import("./ssr.js")>(
             "ssr",
-            "index"
+            "index",
           );
 
         const stream = await renderErrorBoundaryResponse(
@@ -231,7 +232,7 @@ export function app(Layout: Layout, options?: AppOptions) {
               }
             : {
                 message: String(err),
-              }
+              },
         );
         return new Response(stream, {
           headers: {
