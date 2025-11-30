@@ -46,7 +46,7 @@ export function preserveClassNames(): Plugin {
                 callExpression(
                   memberExpression(
                     identifier("Object"),
-                    identifier("defineProperty")
+                    identifier("defineProperty"),
                   ),
                   [
                     thisExpression(),
@@ -54,17 +54,17 @@ export function preserveClassNames(): Plugin {
                     objectExpression([
                       objectProperty(
                         stringLiteral("value"),
-                        stringLiteral(id.name)
+                        stringLiteral(id.name),
                       ),
                       objectProperty(
                         stringLiteral("enumerable"),
-                        booleanLiteral(false)
+                        booleanLiteral(false),
                       ),
                     ]),
-                  ]
-                )
+                  ],
+                ),
               ),
-            ])
+            ]),
           );
         },
       });

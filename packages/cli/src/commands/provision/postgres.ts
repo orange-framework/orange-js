@@ -40,7 +40,7 @@ export async function provisionPostgres(client: Cloudflare, accountId: string) {
       start: "Fetching existing databases...",
       success: (value) => `Found ${value.result.length} existing databases`,
       error: "Failed to fetch existing databases",
-    }
+    },
   );
 
   const existingDatabases = hyperdriveDatbases.result.map((db) => db.name);
@@ -132,7 +132,7 @@ export async function provisionPostgres(client: Cloudflare, accountId: string) {
       success: (value) =>
         `Database ${databaseName} provisioned as ${orange(value.id)}`,
       error: "Failed to provision database",
-    }
+    },
   );
 
   patchConfig(
@@ -146,7 +146,7 @@ export async function provisionPostgres(client: Cloudflare, accountId: string) {
         },
       ],
     },
-    true
+    true,
   );
 
   const createClient = await confirm({
@@ -162,15 +162,15 @@ export async function provisionPostgres(client: Cloudflare, accountId: string) {
         connectFileTemplate(
           databaseName,
           'import { Client } from "pg";',
-          `new Client(env.${camelCase(databaseName)}.connectionString)`
-        )
+          `new Client(env.${camelCase(databaseName)}.connectionString)`,
+        ),
       )
       .with("postgres", () =>
         connectFileTemplate(
           databaseName,
           'import postgres from "postgres";',
-          `postgres(env.${camelCase(databaseName)}.connectionString)`
-        )
+          `postgres(env.${camelCase(databaseName)}.connectionString)`,
+        ),
       )
       .with("drizzle-orm-pg", () =>
         connectFileTemplate(
@@ -179,8 +179,8 @@ export async function provisionPostgres(client: Cloudflare, accountId: string) {
             'import { drizzle } from "drizzle-orm/node-postgres";',
             'import * as schema from "./schema.server";',
           ],
-          `drizzle(env.${camelCase(databaseName)}.connectionString, { schema })`
-        )
+          `drizzle(env.${camelCase(databaseName)}.connectionString, { schema })`,
+        ),
       )
       .with("drizzle-orm-postgres", () =>
         connectFileTemplate(
@@ -189,8 +189,8 @@ export async function provisionPostgres(client: Cloudflare, accountId: string) {
             'import { drizzle } from "drizzle-orm/postgres-js";',
             'import * as schema from "./schema.server";',
           ],
-          `drizzle(env.${camelCase(databaseName)}.connectionString, { schema })`
-        )
+          `drizzle(env.${camelCase(databaseName)}.connectionString, { schema })`,
+        ),
       )
       .exhaustive();
 
@@ -209,17 +209,17 @@ export async function provisionPostgres(client: Cloudflare, accountId: string) {
 
   step(
     `Created connection to postgres accessible via \`${c.dim(
-      `env.${camelCase(databaseName)}`
-    )}\` and \`${c.dim(`context.${camelCase(databaseName)}`)}\``
+      `env.${camelCase(databaseName)}`,
+    )}\` and \`${c.dim(`context.${camelCase(databaseName)}`)}\``,
   );
 
   warn(
     dedent`
     Add \`${orange("connect")}\` from \`${orange(
-      "app/database.context.ts"
+      "app/database.context.ts",
     )}\` to your entrypoint defined in \`${orange("app/entry.server.tsx")}\`
     See more at ${orange("https://orange-js.dev/docs/context")}
-    `.trim()
+    `.trim(),
   );
 }
 
@@ -275,7 +275,7 @@ async function determineClient(): Promise<
 function connectFileTemplate(
   databaseName: string,
   imports: string | string[],
-  databaseExpr: string
+  databaseExpr: string,
 ) {
   return dedent`
   import { env } from "cloudflare:workers";

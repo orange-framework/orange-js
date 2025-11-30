@@ -26,12 +26,12 @@ export function configPlugin(): Plugin {
               // wrangler can deploy self-contained `dist/rsc`
               outDir: "./dist/rsc/ssr",
             },
+            resolve: {
+              noExternal: true,
+              dedupe: ["react", "react-dom"],
+            },
             optimizeDeps: {
-              exclude: [
-                "virtual:orange/routes",
-                "cloudflare:workers",
-                "cloudflare:workerflows",
-              ],
+              include: ["react", "react-dom"],
             },
           },
           client: {
@@ -39,6 +39,9 @@ export function configPlugin(): Plugin {
               rollupOptions: {
                 external: ["virtual:orange/routes"],
               },
+            },
+            resolve: {
+              dedupe: ["react", "react-dom"],
             },
             optimizeDeps: {
               exclude: [

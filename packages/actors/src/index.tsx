@@ -15,14 +15,14 @@ type RSCPayload = { root: React.ReactNode };
 
 export class Actor<Env> extends CfActor<Env> {
   Component(
-    props: Record<string, unknown>
+    props: Record<string, unknown>,
   ): React.ReactNode | Promise<React.ReactNode> {
     return null;
   }
 
   async __rscStream(
     name: string,
-    props: Record<string, any>
+    props: Record<string, any>,
   ): Promise<[ReadableStream, boolean]> {
     const Component = (this[name as keyof this] as any).bind(this);
     const rscStream = renderToReadableStream<RSCPayload>({
@@ -47,7 +47,7 @@ async function internalComponent<T extends Actor<Env>, Env>(
   props: {
     actor: ActorConstructor<T>;
     name?: string;
-  } & PropsFromDurableObject<T, Env, "Component">
+  } & PropsFromDurableObject<T, Env, "Component">,
 ) {
   if ("children" in props) {
     throw new Error("Children are not currently supported");
@@ -76,7 +76,7 @@ async function internalComponent<T extends Actor<Env>, Env>(
 
   const rscStream = await stub.__rscStream("Component", rest);
   const payload = await createFromReadableStream<RSCPayload>(
-    rscStream[0] as ReadableStream
+    rscStream[0] as ReadableStream,
   );
 
   return {
@@ -88,14 +88,14 @@ async function internalComponent<T extends Actor<Env>, Env>(
 type PropsFromDurableObject<
   T extends Actor<Env>,
   Env,
-  K extends keyof T
+  K extends keyof T,
 > = T[K] extends (arg: infer Z) => React.ReactNode | Promise<React.ReactNode>
   ? Z
   : never;
 
 export type ActorConstructor<T extends Actor<any> = Actor<any>> = new (
   state: ActorState,
-  env: any
+  env: any,
 ) => T;
 
 export { getActor } from "@cloudflare/actors";
@@ -104,7 +104,7 @@ async function Component<T extends Actor<Env>, Env>(
   props: {
     actor: ActorConstructor<T>;
     name?: string;
-  } & PropsFromDurableObject<T, Env, "Component">
+  } & PropsFromDurableObject<T, Env, "Component">,
 ) {
   const { root, isObserved } = await internalComponent(props);
 

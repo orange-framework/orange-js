@@ -1,14 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const createFromReadableStream = import.meta.env.SSR
-  ? () => {
-      throw new Error("createFromReadableStream is not available in SSR");
-    }
-  : await import("@vitejs/plugin-rsc/browser").then(
-      (m) => m.createFromReadableStream
-    );
-
 type ClientComponentProps = {
   children: React.ReactNode;
   actorName: string;
@@ -26,7 +18,7 @@ export function ClientComponent({
     useEffect(() => {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const ws = new WebSocket(
-        `${protocol}//${window.location.host}/${actorName}/${id}`
+        `${protocol}//${window.location.host}/${actorName}/${id}`,
       );
 
       ws.addEventListener("message", async (event) => {
@@ -38,6 +30,10 @@ export function ClientComponent({
             controller.close();
           },
         });
+        const { createFromReadableStream } = await import(
+          "@vitejs/plugin-rsc/browser"
+        );
+
         const created = await createFromReadableStream(stream);
         setComponent((created as any).root);
       });

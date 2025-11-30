@@ -41,15 +41,18 @@
     "@cloudflare/actors": "0.0.1-beta.1"
   },
   "peerDependencies": {
-    "react": ">=19",
-    "react-dom": ">=19"
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@cloudflare/actors": "0.0.1-beta.1",
     "@cloudflare/workers-types": "^4.20250413.0",
     "@types/node": "^22.13.0",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-rsc": "^0.5.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "typescript": "^5.7.2"
   },
   "files": [
@@ -58,6 +61,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "hono": "^4.6.20"
+    "hono": "^4.6.20",
+    "rsc-html-stream": "^0.0.7"
   }
 }

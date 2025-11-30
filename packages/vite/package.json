@@ -27,13 +27,11 @@
   "author": "zeb@zebulon.dev",
   "license": "MIT",
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.13.6",
-    "@swc/core": "^1.11.20",
     "@types/babel__generator": "^7.6.8",
     "@types/babel__traverse": "^7.20.6",
     "@types/node": "^22.13.0",
     "typescript": "^5.7.2",
-    "vite": "^7.1.5"
+    "vite": "^7.2.4"
   },
   "dependencies": {
     "@babel/generator": "^7.26.5",
@@ -41,9 +39,11 @@
     "@babel/plugin-proposal-decorators": "^7.28.0",
     "@babel/traverse": "^7.26.7",
     "@babel/types": "^7.26.7",
+    "@cloudflare/vite-plugin": "^1.15.3",
     "@swc-node/core": "^1.13.3",
-    "@vitejs/plugin-react": "^4.7.0",
-    "@vitejs/plugin-rsc": "^0.4.31",
+    "@swc/core": "^1.11.20",
+    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-rsc": "^0.5.2",
     "dedent": "^1.5.3",
     "es-module-lexer": "^1.6.0",
     "minimatch": "^10.0.1",
