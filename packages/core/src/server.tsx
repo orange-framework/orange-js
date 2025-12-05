@@ -159,11 +159,7 @@ async function rscResponse({
     });
   }
 
-  const { renderHTML } = await import.meta.viteRsc.loadModule<
-    typeof import("./ssr.js")
-  >("ssr", "index");
-
-  const htmlStream = await renderHTML(rscStream, {
+  const htmlStream = await renderHtml(rscStream, {
     formState,
     // allow quick simulation of javscript disabled browser
     debugNojs: url.searchParams.has("__nojs"),
@@ -186,6 +182,16 @@ import.meta.hot?.accept();
 const wsPattern = new URLPattern({
   pathname: "/:actor/:id",
 });
+
+type RenderHtml = typeof import("./ssr.js").renderHTML;
+
+export const renderHtml: RenderHtml = async (stream, options) => {
+  const { renderHTML } = await import.meta.viteRsc.loadModule<
+    typeof import("./ssr.js")
+  >("ssr", "index");
+
+  return renderHTML(stream, options);
+};
 
 export function app(Layout: Layout, options?: AppOptions) {
   return {

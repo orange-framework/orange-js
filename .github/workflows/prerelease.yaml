@@ -40,6 +40,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Publish web-fragments
+        run: pnpm publish --no-git-checks --tag dev --access public
+        working-directory: packages/web-fragments
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish vite
         run: pnpm publish --no-git-checks --tag dev --access public
         working-directory: packages/vite
@@ -69,10 +75,10 @@ jobs:
 
             Install the prerelease packages with:
             \`\`\`bash
-            npm install @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} && npm install -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
-            pnpm add @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} && pnpm add -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
-            yarn add @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} && yarn add -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
-            bun add @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} && bun add -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
+            npm install @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} @orange-js/web-fragments@0.0.0-${sha} && npm install -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
+            pnpm add @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} @orange-js/web-fragments@0.0.0-${sha} && pnpm add -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
+            yarn add @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} @orange-js/web-fragments@0.0.0-${sha} && yarn add -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
+            bun add @orange-js/orange@0.0.0-${sha} @orange-js/actors@0.0.0-${sha} @orange-js/web-fragments@0.0.0-${sha} && bun add -D @orange-js/vite@0.0.0-${sha} @orange-js/cli@0.0.0-${sha}
             \`\`\``;
 
             github.rest.issues.createComment({

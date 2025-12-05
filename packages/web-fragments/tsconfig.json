@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "vite/client",
+      "@vitejs/plugin-rsc/types",
+      "@cloudflare/workers-types",
+      "@types/node",
+      "@orange-js/orange/modules"
+    ],
+    "outDir": "dist"
+  }
+}
